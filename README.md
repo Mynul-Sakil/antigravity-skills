@@ -5,50 +5,154 @@
 [![Rules](https://img.shields.io/badge/Rules-100-8b5cf6?style=for-the-badge)](#how-it-works)
 [![Agents](https://img.shields.io/badge/Works_With-Antigravity_%26_Claude_Code-f59e0b?style=for-the-badge)](./INSTALLATION.md)
 
-A unified, production-ready customization pack for **Antigravity** (and **Claude Code**) bundling **576 on-demand skills**, **25 specialist subagents**, and **100 context-aware engineering rules** — complete with zero-dependency Python 3 CLI calculators and one-command local or global updates.
+A unified, production-ready customization pack for **Antigravity** (and **Claude Code**) featuring **576 on-demand skills**, **25 specialist subagents**, and **100 context-aware engineering rules** — with **selective sparse-checkout installation** so you can install the lean **Minimal Core** (default), **a single skill**, **a role pack**, or **all 576 skills**.
 
 ---
 
-## Quick Start (30 Seconds)
+## Install Modes Overview
 
-### Interactive Install or Update (Asks *Current Directory* vs *Global*)
+| Mode | CLI Flag | What Gets Installed | Downloads Whole Repo? |
+| :--- | :--- | :--- | :---: |
+| **Minimal *(Default)*** | *(none)* or `--minimal` | **19** daily core skills, **8** core subagents, **8** core rules | **No** (sparse fetch) |
+| **Specific Skill(s)** | `--skill <name>` | **Only** the requested skill folder(s) (`SKILL.md` + `scripts/` + `references/`) | **No** (sparse fetch) |
+| **Role Pack** | `--role <role>` | Curated pack (`frontend`, `backend`, `fullstack`, `qa`, `security`, `devops`, `ai-ml`, `finance`, `product`, `marketing`, `founder`) | **No** (sparse fetch) |
+| **Full Catalog** | `--all` | All **576** skills, **25** subagents, and **100** rules | Yes |
 
-Run inside any project folder. You will be prompted to install/update in your **current directory** or **globally**:
+---
+
+## Quick Start (Copy One Command at a Time)
+
+### Interactive Wizard (Asks *Location* + *Install Mode*)
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash
 ```
 
-### Direct One-Line Commands
+---
+
+### 1. Antigravity — Minimal Install *(Default: 19 Core Skills, 8 Subagents, 8 Rules)*
+
+**Current Project Directory (`./.agents`):**
 
 ```bash
-# 1. Antigravity — Current Project Directory (./.agents)
 curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --local
+```
 
-# 2. Antigravity — Global Plugin (~/.gemini/config/plugins/antigravity-skills)
+**Global Plugin (`~/.gemini/config/plugins/antigravity-skills`):**
+
+```bash
 curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --global
+```
 
-# 3. Claude Code — Current Project (./.claude/skills) or Global (~/.claude/skills)
+---
+
+### 2. Install Specific Skill(s) Only *(Without Downloading the Whole Repo)*
+
+**Install a single skill in your current project (example: `stock-analysis`):**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --local --skill stock-analysis
+```
+
+**Install multiple skills at once (comma-separated, local or global):**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --global --skill stock-analysis,financial-analyst,deep-research
+```
+
+> Adding `--skill` on top of an existing `minimal` or `--role` install is **additive** — it keeps your existing skills intact and adds the new one.
+
+---
+
+### 3. Install by Role (`--role`)
+
+Available roles: `frontend`, `backend`, `fullstack`, `qa`, `security`, `devops`, `ai-ml`, `finance`, `product`, `marketing`, `founder` (alias: `c-suite`).
+
+**Install a role pack in your current project (example: `fullstack`):**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --local --role fullstack
+```
+
+**Install a role pack globally (example: `finance`):**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --global --role finance
+```
+
+**List all 11 role packs and their skill counts:**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --list-roles
+```
+
+---
+
+### 4. Antigravity — Full Catalog (`--all`: All 576 Skills, 25 Subagents, 100 Rules)
+
+**Current Project Directory (`./.agents`):**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --local --all
+```
+
+**Global Plugin (`~/.gemini/config/plugins/antigravity-skills`):**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --global --all
+```
+
+---
+
+### 5. Claude Code (`--claude`)
+
+**Claude Code — Minimal Pack in Current Project (`./.claude/skills`):**
+
+```bash
 curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --claude --local
-curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --claude --global
+```
 
-# 4. Update an Existing Installation (auto-detects local/global & preserves custom files)
+**Claude Code — Minimal Pack Globally (`~/.claude/skills`):**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --claude --global
+```
+
+**Claude Code — Install Specific Skill Only (example: `stock-analysis`):**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --claude --local --skill stock-analysis
+```
+
+**Claude Code — Install All 576 Skills Globally:**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --claude --global --all
+```
+
+---
+
+### 6. Update an Existing Installation
+
+Auto-detects your local/global installation and refreshes **only** the mode, roles, and skills you installed (while preserving custom files):
+
+```bash
 curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --update
 ```
 
-> Full instructions for manual `git clone`, merging into existing `.agents/` folders, `skills.json` context tuning, Windows setup, and uninstallation: **[INSTALLATION.md](./INSTALLATION.md)**
+> Full instructions for role contents, `skills.json` filtering, Windows setup, and uninstallation: **[INSTALLATION.md](./INSTALLATION.md)**
 
 ---
 
 ## How It Works
 
-This repository is structured natively for Antigravity's **Progressive Disclosure** system so you get deep domain workflows without bloating your prompt context window:
+This repository is built natively around **Progressive Disclosure** so you get deep domain workflows without bloating your prompt context window:
 
-| Component | Folder | Count | How It Loads | Context Cost |
+| Component | Folder | Total Available | How It Loads | Context Cost |
 | :--- | :--- | :---: | :--- | :--- |
 | **Skills & Slash Workflows** | `skills/<name>/SKILL.md` | **576** | Type `/<name>` in chat **or** ask in plain English | Full `SKILL.md`, `references/`, and `scripts/` load **only when activated** |
 | **Specialist Subagents** | `agents/<name>.md` | **25** | Delegated via `invoke_subagent` (`subagent: true`) | Runs in an **isolated subagent context**; sized to keep built-in `browser` & `research` active |
-| **Core Engineering Rules** | `rules/common-*.md` | **9** | `trigger: always_on` | Compact baseline (immutability, TDD, security, code review, git workflow) |
+| **Core Engineering Rules** | `rules/common-*.md` | **8** (+1 optional) | `trigger: always_on` | Compact baseline (immutability, TDD, security, code review, git workflow) |
 | **Language & Stack Rules** | `rules/<stack>-*.md` | **91** | `trigger: glob` (e.g. `**/*.ts`, `**/*.py`) | **Zero tokens** until you open or edit matching files |
 
 ---
@@ -59,7 +163,7 @@ Every skill includes structured workflows, reference checklists, and (where appl
 
 | Domain | Representative `/slash` Skills |
 | :--- | :--- |
-| **Architecture & Specs** | `/plan-prd`, `/prp-plan`, `/database-schema-designer`, `/api-design`, `/codebase-onboarding`, `/tech-debt-tracker`, `/monorepo-navigator` |
+| **Architecture & Specs** | `/plan`, `/multi-plan`, `/plan-prd`, `/prp-plan`, `/database-schema-designer`, `/api-design`, `/codebase-onboarding`, `/tech-debt-tracker`, `/monorepo-navigator` |
 | **Full-Stack & Languages** | `/nextjs-best-practices`, `/nextjs-turbopack`, `/bun-runtime`, `/react-review`, `/fastapi-review`, `/python-review`, `/go-review`, `/rust-review`, `/flutter-review` |
 | **TDD, QA & Playwright** | `/tdd-workflow`, `/pw`, `/pw-init`, `/playtest`, `/react-test`, `/api-test-suite-builder`, `/test-coverage`, `/build-fix` |
 | **Multi-Agent Orchestration** | `/orch-add-feature`, `/orch-fix-defect`, `/orch-refine-code`, `/gan-build`, `/gan-design`, `/santa-loop`, `/council`, `/hub-run` |
@@ -91,12 +195,12 @@ Configured in `agents/*.md` using Antigravity's native schema (`subagent: true`,
 
 ### 1. Run Any Skill as a Slash Command (Antigravity & Claude Code)
 
-```text
-/stock-analysis Analyze AAPL fundamentals and peer valuation multiples
-/plan-prd Real-time portfolio alert notification service
-/tdd-workflow Add JWT refresh token rotation with 80%+ test coverage
-/today-summary
-```
+| Prompt Example | What It Runs |
+| :--- | :--- |
+| `/stock-analysis Analyze AAPL fundamentals and peer valuation multiples` | Equity fundamentals & valuation report |
+| `/plan-prd Real-time portfolio alert notification service` | Problem-first PRD + implementation plan |
+| `/tdd-workflow Add JWT refresh token rotation with 80%+ test coverage` | Red -> Green -> Refactor TDD workflow |
+| `/today-summary` | Concise single-line summary of today's completed work |
 
 ### 2. Automatic Plain-English Activation
 
@@ -107,11 +211,10 @@ You don't have to memorize skill names — just ask naturally:
 
 ### 3. Run Bundled Zero-Dependency Python CLI Calculators
 
-Many skills ship deterministic Python 3 standard-library calculators inside `scripts/`:
+Many skills ship deterministic Python 3 standard-library calculators inside `scripts/` (for example, after installing `--skill financial-analyst`, `--role finance`, or `--all`):
 
 ```bash
-python3 .agents/skills/financial-analyst/scripts/ratio_calculator.py \
-  .agents/skills/financial-analyst/assets/sample_financial_data.json
+python3 .agents/skills/financial-analyst/scripts/ratio_calculator.py .agents/skills/financial-analyst/assets/sample_financial_data.json
 ```
 
 ---
@@ -123,9 +226,10 @@ antigravity-skills/
 ├── skills/          # 576 modular skills (<name>/SKILL.md + scripts/ + references/ + assets/)
 ├── agents/          # 25 native Antigravity specialist subagents
 ├── rules/           # 100 rules (9 always_on core rules + 91 glob-triggered stack rules)
+├── profiles.json    # Declarative catalog for 'minimal' default & 11 '--role' packs
 ├── plugin.json      # Native Antigravity plugin manifest (used for --global installs)
-├── install.sh       # Interactive & CLI installer, updater, and uninstaller
-├── INSTALLATION.md  # Full Antigravity + Claude Code setup, update & tuning guide
+├── install.sh       # Selective sparse-checkout installer, updater & uninstaller
+├── INSTALLATION.md  # Complete Antigravity + Claude Code setup, modes & update guide
 └── README.md
 ```
 
@@ -133,5 +237,5 @@ antigravity-skills/
 
 ## Documentation & Support
 
-- **Full Setup, Claude Code Guide, Updates & `skills.json` Filtering**: [INSTALLATION.md](./INSTALLATION.md)
+- **Complete Setup, Single-Skill / Role Guides, Claude Code & Uninstallation**: [INSTALLATION.md](./INSTALLATION.md)
 - **Author**: [Mynul-Sakil](https://github.com/Mynul-Sakil)
