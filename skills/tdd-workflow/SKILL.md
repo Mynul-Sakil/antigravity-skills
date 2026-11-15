@@ -1,7 +1,6 @@
 ---
 name: tdd-workflow
-description: Use this skill when writing new features, fixing bugs, or refactoring code. Enforces test-driven development with 80%+ coverage including unit, integration, and E2E tests.
-license: MIT
+description: "Enforce strict Red-Green-Refactor Test-Driven Development (TDD) with 80%+ unit, integration, and E2E coverage. Includes Python CLI helpers for test scaffolding, LCOV/JSON coverage analysis, fixture generation, and TDD phase tracking."
 ---
 
 # Test-Driven Development Workflow
@@ -465,3 +464,23 @@ test('updates user', () => {
 ---
 
 **Remember**: Tests are not optional. They are the safety net that enables confident refactoring, rapid development, and production reliability.
+
+
+---
+
+## Bundled Python TDD & Coverage CLI Helpers
+
+Use the stdlib-only scripts in `scripts/` when automating test generation, coverage parsing, or fixture scaffolding:
+
+```bash
+python3 scripts/tdd_workflow.py --help
+python3 scripts/coverage_analyzer.py assets/sample_coverage_report.lcov
+python3 scripts/test_generator.py assets/sample_input_typescript.json
+python3 scripts/fixture_generator.py --help
+python3 scripts/metrics_calculator.py --help
+```
+
+### Reference Guides
+- [references/tdd-best-practices.md](references/tdd-best-practices.md) — Red-Green-Refactor discipline & anti-patterns
+- [references/framework-guide.md](references/framework-guide.md) — Jest, Vitest, Pytest, JUnit & Go testing adapters
+- [references/ci-integration.md](references/ci-integration.md) — Enforcing coverage thresholds in CI pipelines

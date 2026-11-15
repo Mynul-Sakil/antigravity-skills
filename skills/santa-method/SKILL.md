@@ -1,8 +1,6 @@
 ---
 name: santa-method
-description: "Multi-agent adversarial verification: two independent reviewers with the same rubric must both pass before output ships, with a fix-and-re-review convergence loop and human escalation cap. Use when gating publishing, production deploys, compliance or brand-sensitive content, or hallucination-prone claims before they ship."
-metadata:
-  origin: "Ronald Skelton - Founder, RapportScore.ai"
+description: "Adversarial dual-reviewer verification loop (Santa Method & /santa-loop): two independent isolated reviewers (subagents or cross-model CLI) must both return PASS/NICE against an objective rubric before code or content ships."
 ---
 
 # Santa Method
@@ -305,3 +303,10 @@ Cost of NOT Santa = (reputation damage) + (correction effort) + (trust erosion)
 ```
 
 For batch operations, the sampling pattern reduces cost to ~15-20% of full verification while catching >90% of systematic issues.
+
+
+---
+
+## CLI Cross-Model Code Gate Mode (`/santa-loop`)
+
+To run the git-backed CLI convergence loop (Reviewer A in Claude + Reviewer B via Codex/Gemini/isolated fallback, committing fixes per NAUGHTY round up to 3 iterations and pushing only on NICE), follow [references/cli-dual-model-loop.md](references/cli-dual-model-loop.md).

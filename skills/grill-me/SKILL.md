@@ -1,65 +1,52 @@
 ---
 name: grill-me
-description: Interview the user relentlessly about a plan or design until reaching shared understanding, resolving each branch of the decision tree. Use when user wants to stress-test a plan, get grilled on their design, or mentions "grill me".
+description: "Relentlessly interview the user one question at a time (with recommended answers) to resolve every branch of a design/plan decision tree. Automatically grounds questions in CONTEXT.md glossaries and docs/adr/ ADRs when present."
 license: MIT
-metadata:
-  derived_from: "https://github.com/mattpocock/skills/tree/main/skills/productivity/grill-me"
-  original_author: "Matt Pocock (@mattpocock)"
-  original_license: MIT
-  voice: "Matt Pocock — relentless, one-at-a-time, explores-codebase-first"
-  version: 1.0.0
 ---
 
-# Grill Me
+# Grill Me (Plan Interrogation & Docs-Anchored Design Review)
 
-> Derived from [Matt Pocock's grill-me](https://github.com/mattpocock/skills/tree/main/skills/productivity/grill-me) (MIT). Matt's interview discipline preserved verbatim. Additions: extraction + question + session tools + references + cs-* wrapper (see [references/companion_tooling.md](references/companion_tooling.md)).
+Interview the user relentlessly about every aspect of a plan or design until reaching shared understanding, walking depth-first down the decision tree one question at a time.
 
-Interview me relentlessly about every aspect of this plan until we reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one-by-one. For each question, provide your recommended answer.
+## Non-Negotiable Rules
 
-Ask the questions one at a time.
+1. **One question per turn.** Never bundle multiple questions.
+2. **Always provide a recommended answer + 1-sentence rationale.** Never ask a lazy open-ended *"what do you think?"*.
+3. **Explore the codebase & docs before asking.** If `grep`, `read_file`, `CONTEXT.md`, or `docs/adr/` answers it, inspect first and confirm evidence instead of asking.
+4. **Walk depth-first & respect dependencies.** Resolve foundational decision A before dependent decision B.
 
-If a question can be answered by exploring the codebase, explore the codebase instead.
+## Standard Workflow
 
-## Rules (preserved + amplified)
+1. **Pre-Flight Check (Codebase + Optional Domain Docs):**
+   - If `CONTEXT.md` exists: run `python3 scripts/context_md_linter.py CONTEXT.md` and `python3 scripts/glossary_code_consistency.py --context CONTEXT.md --code src/` to surface dead glossary terms or conflicting domain language.
+   - If `docs/adr/` exists: run `python3 scripts/adr_scanner.py docs/adr/` to inspect architectural decisions already locked.
+   - Extract plan branches with `python3 scripts/decision_tree_extractor.py` and `python3 scripts/question_generator.py`.
+   - Start tracking: `python3 scripts/grill_session_tracker.py --action start`.
+2. **Interactive Grilling Loop (1 Question/Turn):**
+   ```text
+   Q[i]/[total]: [Focused question]
+   Recommended answer: [Concrete call + 1-sentence rationale]
+   ```
+   - Call out conflicts with `CONTEXT.md` glossary terms or existing code behavior immediately.
+   - If `CONTEXT.md` is used, update resolved ubiquitous-language definitions inline (see [CONTEXT-FORMAT.md](CONTEXT-FORMAT.md)).
+   - Offer a new ADR (see [ADR-FORMAT.md](ADR-FORMAT.md)) **only** when a decision is (1) hard to reverse, (2) surprising without context, and (3) a genuine trade-off.
+3. **Closing Summary:**
+   - Report locked-in decisions, updated glossary terms, any ADRs created, and remaining open items.
 
-1. **One question per turn.** Never bundle.
-2. **Provide a recommended answer with each question.** Defaulting to "what do you think?" is lazy.
-3. **Explore the codebase before asking.** If `grep` / `Read` resolves it, do that first. Saves a turn.
-4. **Walk the tree depth-first.** Finish a branch before opening another.
-5. **Track dependencies.** If decision B depends on decision A, ask A first.
+## Bundled Python Tools (Stdlib-Only)
 
-## Workflow
+| Script | Purpose |
+| :--- | :--- |
+| `scripts/decision_tree_extractor.py` | Extract decision branches and dependencies from a plan |
+| `scripts/question_generator.py` | Generate ordered forcing questions with recommendations |
+| `scripts/grill_session_tracker.py` | Track resolved vs open branches across turns |
+| `scripts/context_md_linter.py` | Validate `CONTEXT.md` glossary structure |
+| `scripts/adr_scanner.py` | Validate `docs/adr/NNNN-slug.md` numbering and completeness |
+| `scripts/glossary_code_consistency.py` | Cross-check `CONTEXT.md` terms against codebase identifiers |
 
-1. User provides a plan or design (or path to one).
-2. Run `scripts/decision_tree_extractor.py` to extract branches.
-3. Run `scripts/question_generator.py` to produce the question list with recommendations.
-4. Start a session: `scripts/grill_session_tracker.py --action start`.
-5. Walk the tree, one question at a time, recording answers in the session.
-6. When all branches resolved: report "shared understanding reached" + the locked-in decisions.
-
-## Output Pattern
-
-Per question turn:
-
-```
-Q[i]/[total]: [question]
-Recommended answer: [your call + 1-sentence rationale]
-
-(Or: I explored the codebase and found [evidence]. Confirm?)
-```
-
-## Tooling
-
-See [references/companion_tooling.md](references/companion_tooling.md). Tools: extractor + generator + tracker. Agent: `cs-grill-master`. Command: `/cs-grill-me`.
-
----
-
-**Version:** 1.0.0
-**Derived:** Matt Pocock (MIT) + this repo's wrapper
-
-## More in this skill
-
-Load these only when the task needs them.
-
-- [references/forcing_question_patterns.md](references/forcing_question_patterns.md) — Forcing-Question Patterns for Plan Interrogation
-- [references/when_to_stop_grilling.md](references/when_to_stop_grilling.md) — When to Stop Grilling
+## References
+- [references/forcing_question_patterns.md](references/forcing_question_patterns.md) — Forcing-question patterns
+- [references/when_to_stop_grilling.md](references/when_to_stop_grilling.md) — Convergence criteria
+- [references/ubiquitous_language.md](references/ubiquitous_language.md) — Domain glossary discipline
+- [references/adr_practice.md](references/adr_practice.md) — High-signal ADR criteria
+- [references/context_md_as_artifact.md](references/context_md_as_artifact.md) — Maintaining `CONTEXT.md`

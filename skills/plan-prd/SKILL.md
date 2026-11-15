@@ -1,6 +1,6 @@
 ---
 name: plan-prd
-description: "Generate a lean, problem-first PRD and hand off to /plan for implementation planning."
+description: "Generate problem-first Product Requirements Documents (PRDs): supports Lean 4-Gate Mode (.prd.md handoff to /plan) and Deep Interactive Mode (hypothesis-driven spec, competitor/codebase grounding, and phased epic roadmap)."
 ---
 
 # PRD Command
@@ -160,3 +160,10 @@ Next step: /plan .claude/prds/{name}.prd.md
 - **NO_IMPLEMENTATION_DETAIL**: file paths, libraries, or task breakdowns are absent — if they appeared, move them to the `/plan` step.
 
 Background on the staged markdown flow: [docs/PLAN-PRD-PATTERN.md](../docs/PLAN-PRD-PATTERN.md).
+
+
+---
+
+## Deep Interactive PRD Mode (`--deep` or Multi-Phase Initiatives)
+
+When scoping a larger product, multi-sprint epic, or greenfield initiative that needs interactive back-and-forth questioning, market/competitor context, user story matrices, and phased delivery milestones, load [references/deep-interactive-prd.md](references/deep-interactive-prd.md).

@@ -1,6 +1,19 @@
 ---
-name: "jira-expert"
-description: "Jira setup and queries: JQL, workflows, custom fields, automation, dashboards. Use whenever the user needs a Jira search, filter, dashboard or rule set up, or a workflow fixed."
+name: jira-expert
+description: "Fetch/analyze/transition Jira tickets, build validated JQL queries (jql_query_builder.py), lint workflows (workflow_validator.py), and configure boards, custom fields, automation rules, and dashboards."
+---
+
+## Single-Ticket Developer Workflow (`/jira get | comment | transition | search`)
+
+When working directly on an individual Jira ticket during implementation:
+
+1. **Get & Analyze (`get <KEY>`):** Fetch issue via Atlassian MCP (`mcp__atlassian__getJiraIssue`) or REST API (`JIRA_URL`, `JIRA_EMAIL`, `JIRA_API_TOKEN`) and extract:
+   - Summary, Status, Priority, Type, Linked Blockers
+   - Numbered Requirements & Acceptance Criteria (`- [ ]`)
+   - Happy-path, error-case, and edge-case test scenarios -> hand off to `/plan` and `tdd-workflow`
+2. **Progress Comment (`comment <KEY>`):** Summarize verified commits/tests and post via `mcp__atlassian__addCommentToJiraIssue`.
+3. **Workflow Transition (`transition <KEY>`):** List valid transitions via `mcp__atlassian__getTransitionsForJiraIssue`, confirm with user, and execute `mcp__atlassian__transitionJiraIssue`.
+
 ---
 
 # Atlassian Jira Expert

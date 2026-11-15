@@ -1,7 +1,12 @@
 ---
 name: e2e-testing
-description: Playwright E2E testing patterns, Page Object Model, configuration, CI/CD integration, artifact management, and flaky test strategies. Use when writing Playwright tests, structuring page objects, or fixing flaky E2E runs in CI.
-license: MIT
+description: "Initialize and scale Playwright E2E testing: framework-aware project setup (Next.js, Vite, Vue, Angular), Page Object Model (POM), CI/CD workflows, trace/video artifacts, and flaky test remediation."
+---
+
+## Bootstrapping Playwright From Scratch (`pw-init` Workflow)
+
+If Playwright is not yet configured in the repository (`set up playwright`, `init playwright`, `add e2e tests`), follow the 9-step framework-aware bootstrap (detecting Next.js/Vite/Vue/Angular ports, generating `playwright.config.ts`, `e2e/` directories, GitHub/GitLab CI workflow, `.gitignore`, and `test:e2e` scripts) in [references/playwright-project-init.md](references/playwright-project-init.md).
+
 ---
 
 # E2E Testing Patterns

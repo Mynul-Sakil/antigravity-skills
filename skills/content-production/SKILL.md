@@ -274,3 +274,11 @@ Load these only when the task needs them.
 
 - [references/ai-citation-readiness.md](references/ai-citation-readiness.md) — AI Citation Readiness
 - [references/content-templates.md](references/content-templates.md) — Content Templates — Auto-Selection Guide
+
+## Additional Bundled Templates & Frameworks
+
+- [references/content_frameworks.md](references/content_frameworks.md) — Long-form, pillar, and copywriting frameworks
+- [references/brand_guidelines.md](references/brand_guidelines.md) — Brand voice & editorial style checklist
+- [references/social_media_optimization.md](references/social_media_optimization.md) — Channel-specific social distribution guide
+- [references/analytics_guide.md](references/analytics_guide.md) — Content attribution & KPI measurement guide
+- [assets/content_calendar_template.md](assets/content_calendar_template.md) — Editorial calendar template

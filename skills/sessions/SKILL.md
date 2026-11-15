@@ -1,6 +1,15 @@
 ---
 name: sessions
-description: "Manage Claude Code session history, aliases, and session metadata."
+description: "Save, resume, list, search, and alias working sessions in ~/.claude/session-data/ (and .agents/sessions/): persist full context (completed work, blockers, git state, next steps) across sessions."
+---
+
+## Quick Save & Resume Subcommands (`/save-session` & `/resume-session`)
+
+- **`sessions save [topic]`** — Capture current git branch/status, completed tasks, verified commands, failed attempts to avoid repeating, and exact next steps into a dated session file (`~/.claude/session-data/YYYY-MM-DD-<short-id>-session.tmp`).
+- **`sessions resume [id-or-latest]`** — Load the most recent session file, verify current `git status` against the saved state, present a concise readiness briefing, and ask to continue from Step 1.
+
+Full structured save & resume templates: [references/save-and-resume-templates.md](references/save-and-resume-templates.md).
+
 ---
 
 # Sessions Command

@@ -55,14 +55,14 @@ By default, running `install.sh` installs **`--minimal`** via Git sparse checkou
 
 | Mode | CLI Flag | Contents | Best For |
 | :--- | :--- | :--- | :--- |
-| **Minimal *(Default)*** | *(omitted)* or `--minimal` | **19** core skills, **8** core subagents, **8** `common-*` rules | Fast, zero-bloat daily engineering baseline |
+| **Minimal *(Default)*** | *(omitted)* or `--minimal` | **17** core skills, **8** core subagents, **8** `common-*` rules | Fast, zero-bloat daily engineering baseline |
 | **Specific Skill(s)** | `--skill <name[,name2]>` | Only the named skill folder(s) | Grabbing 1–5 specialized skills without downloading the repo |
 | **Role Pack** | `--role <role[,role2]>` | Curated role skills + matching subagents + stack rules | Tailoring to your role (`frontend`, `backend`, `fullstack`, `finance`, etc.) |
-| **Full Catalog** | `--all` | All **576** skills, **25** subagents, **100** rules | Complete offline library of every domain skill |
+| **Full Catalog** | `--all` | All **526** skills, **25** subagents, **100** rules | Complete offline library of every domain skill |
 
 ### What Is Included in `minimal` (Default)?
 
-- **19 Skills:** `plan`, `multi-plan`, `plan-prd`, `prp-plan`, `feature-dev`, `codebase-onboarding`, `tdd-workflow`, `build-fix`, `focused-fix`, `code-review`, `pr-review-expert`, `security-review`, `refactor-clean`, `test-coverage`, `commit-craft`, `pr`, `deep-research`, `update-docs`, `today-summary`
+- **17 Skills:** `plan`, `multi-plan`, `plan-prd`, `feature-dev`, `codebase-onboarding`, `tdd-workflow`, `build-fix`, `focused-fix`, `code-review`, `security-review`, `refactor-clean`, `test-coverage`, `commit-craft`, `pr`, `deep-research`, `update-docs`, `today-summary`
 - **8 Subagents:** `planner`, `architect`, `tdd-guide`, `code-reviewer`, `security-reviewer`, `build-error-resolver`, `e2e-runner`, `refactor-cleaner`
 - **8 Core Rules:** `common-agents`, `common-code-review`, `common-coding-style`, `common-development-workflow`, `common-git-workflow`, `common-patterns`, `common-security`, `common-testing`
 
@@ -88,13 +88,13 @@ curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main
 curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --global
 ```
 
-### Full Catalog (`--all`: All 576 Skills) — Current Directory (`./.agents`)
+### Full Catalog (`--all`: All 526 Skills) — Current Directory (`./.agents`)
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --local --all
 ```
 
-### Full Catalog (`--all`: All 576 Skills) — Global (`~/.gemini/config/plugins/antigravity-skills`)
+### Full Catalog (`--all`: All 526 Skills) — Global (`~/.gemini/config/plugins/antigravity-skills`)
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --global --all
@@ -114,13 +114,13 @@ curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main
 
 ### Manual Full Clone (Alternative to `install.sh --all`)
 
-**Clone all 576 skills into your current project (`./.agents`):**
+**Clone all 526 skills into your current project (`./.agents`):**
 
 ```bash
 git clone --depth 1 https://github.com/Mynul-Sakil/antigravity-skills.git .agents
 ```
 
-**Clone all 576 skills globally:**
+**Clone all 526 skills globally:**
 
 ```bash
 mkdir -p ~/.gemini/config/plugins && git clone --depth 1 https://github.com/Mynul-Sakil/antigravity-skills.git ~/.gemini/config/plugins/antigravity-skills
@@ -130,7 +130,7 @@ mkdir -p ~/.gemini/config/plugins && git clone --depth 1 https://github.com/Mynu
 
 ## 5. Installing Specific Skills Without Downloading the Whole Repo (`--skill`)
 
-`--skill` uses blobless Git sparse checkout (`--filter=blob:none --no-checkout`) to download **only** the requested `skills/<name>/` folder (including its `SKILL.md`, `scripts/`, `references/`, and `assets/`) while skipping the other 575 skills.
+`--skill` uses blobless Git sparse checkout (`--filter=blob:none --no-checkout`) to download **only** the requested `skills/<name>/` folder (including its `SKILL.md`, `scripts/`, `references/`, and `assets/`) while skipping the other 525 skills.
 
 - **On a fresh folder:** Installs **only** the skill(s) you asked for.
 - **On an existing install (`minimal` or `--role`):** Merges the new skill **additively** without deleting your previously installed skills.
@@ -154,7 +154,7 @@ curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main
 curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --local --skill stock-analysis,financial-analyst,seo-audit
 ```
 
-### Browse All 576 Available Skill Names
+### Browse All 526 Available Skill Names
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --list-skills
@@ -170,15 +170,15 @@ Each `--role` pack sparse-fetches a curated set of domain skills, matching subag
 | :--- | :---: | :---: | :---: | :--- |
 | `--role frontend` | 15 | 6 | 20 | React, Next.js, TypeScript, Vue, UI design systems, accessibility & Playwright UI testing |
 | `--role backend` | 16 | 9 | 24 | APIs, schemas, Python/FastAPI/Django, Go, Rust, Bun & Stripe payments |
-| `--role fullstack` | 18 | 10 | 20 | End-to-end SaaS shipping (Next.js, React, FastAPI, DB, Stripe, TDD, Playwright) |
-| `--role qa` | 16 | 5 | 16 | TDD, Playwright E2E, flake fixing, BrowserStack, API test suites & coverage |
-| `--role security` | 16 | 4 | 14 | Threat modeling, AI safety, cloud security, red-team & SOC2/ISO27001/GDPR |
+| `--role fullstack` | 17 | 10 | 20 | End-to-end SaaS shipping (Next.js, React, FastAPI, DB, Stripe, TDD, Playwright) |
+| `--role qa` | 14 | 5 | 16 | TDD, Playwright E2E, flake fixing, BrowserStack, API test suites & coverage |
+| `--role security` | 15 | 4 | 14 | Threat modeling, AI safety, cloud security, red-team & SOC2/ISO27001/GDPR |
 | `--role devops` | 14 | 5 | 14 | CI/CD, Docker, Kubernetes, Terraform, AWS, observability, runbooks & incidents |
-| `--role ai-ml` | 16 | 6 | 12 | LLM engineering, RAG pipelines, prompt engineering, eval harnesses & MLOps |
+| `--role ai-ml` | 15 | 6 | 12 | LLM engineering, RAG pipelines, prompt engineering, eval harnesses & MLOps |
 | `--role finance` | 13 | 2 | 9 | Stock analysis, DCF valuation, financial ratios, SaaS metrics, deal screening & CFO |
-| `--role product` | 16 | 3 | 8 | PRDs, product discovery, agile stories, Jira, roadmaps, UX research & A/B tests |
+| `--role product` | 14 | 3 | 8 | PRDs, product discovery, agile stories, Jira, roadmaps, UX research & A/B tests |
 | `--role marketing` | 18 | 2 | 8 | SEO/AEO audits, page/signup/form CRO, copywriting, content, pricing & launches |
-| `--role founder` *(or `c-suite`)* | 18 | 2 | 8 | Virtual C-suite boardroom, fundraising, investor decks, runway & strategy |
+| `--role founder` *(or `c-suite`)* | 17 | 2 | 8 | Virtual C-suite boardroom, fundraising, investor decks, runway & strategy |
 
 ### List All Roles from the CLI
 
@@ -208,15 +208,15 @@ curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main
 
 ## 7. Claude Code Installation Guide (`--claude`)
 
-All **576 skills** follow the universal `SKILL.md` standard and work natively in **Claude Code** (including `/<skill-name>` slash commands). Passing `--claude` syncs only `skills/` (skipping Antigravity-only `agents/` and `rules/`) and tracks files via `.antigravity-skills.manifest` so your `CLAUDE.md`, `settings.json`, and custom skills are **never** touched.
+All **526 skills** follow the universal `SKILL.md` standard and work natively in **Claude Code** (including `/<skill-name>` slash commands). Passing `--claude` syncs only `skills/` (skipping Antigravity-only `agents/` and `rules/`) and tracks files via `.antigravity-skills.manifest` so your `CLAUDE.md`, `settings.json`, and custom skills are **never** touched.
 
-### Claude Code — Minimal Pack *(Default: 19 Core Skills)* in Current Project (`./.claude/skills`)
+### Claude Code — Minimal Pack *(Default: 17 Core Skills)* in Current Project (`./.claude/skills`)
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --claude --local
 ```
 
-### Claude Code — Minimal Pack *(Default: 19 Core Skills)* Globally (`~/.claude/skills`)
+### Claude Code — Minimal Pack *(Default: 17 Core Skills)* Globally (`~/.claude/skills`)
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --claude --global
@@ -234,14 +234,14 @@ curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main
 curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --claude --global --role fullstack
 ```
 
-### Claude Code — Install All 576 Skills Globally
+### Claude Code — Install All 526 Skills Globally
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --claude --global --all
 ```
 
 > [!NOTE]
-> **Claude Code Context Tip:** Using the default `minimal`, `--skill`, or `--role` modes keeps your skill list well inside Claude Code's default `1%` skill-listing budget (`skillListingBudgetFraction: 0.01`). If you install `--all` (576 skills) in Claude Code, you can optionally set `"skillListingBudgetFraction": 0.03` in `~/.claude/settings.json`.
+> **Claude Code Context Tip:** Using the default `minimal`, `--skill`, or `--role` modes keeps your skill list well inside Claude Code's default `1%` skill-listing budget (`skillListingBudgetFraction: 0.01`). If you install `--all` (526 skills) in Claude Code, you can optionally set `"skillListingBudgetFraction": 0.03` in `~/.claude/settings.json`.
 
 ---
 
@@ -265,7 +265,7 @@ mkdir -p .claude && ln -s ../.agents/skills .claude/skills
 
 ## 9. Updating an Existing Installation (`--update`)
 
-`install.sh` stores your active mode, roles, and added skills in `.antigravity-skills.manifest` (`# @state {...}`). When you run `--update`, it refreshes **only** what you installed — it will never unexpectedly bloat a `minimal` or `--skill` install into all 576 skills, and it never overwrites custom or locally edited files.
+`install.sh` stores your active mode, roles, and added skills in `.antigravity-skills.manifest` (`# @state {...}`). When you run `--update`, it refreshes **only** what you installed — it will never unexpectedly bloat a `minimal` or `--skill` install into all 526 skills, and it never overwrites custom or locally edited files.
 
 ### Auto-Detect and Update Antigravity (Local, Global, or Both)
 
@@ -352,7 +352,7 @@ git config --global core.autocrlf input
 ls -1 .agents/skills | wc -l
 ```
 
-*(Expected: `19` for default `--minimal`, `576` for `--all`, or your exact `--skill` / `--role` count.)*
+*(Expected: `17` for default `--minimal`, `526` for `--all`, or your exact `--skill` / `--role` count.)*
 
 ### Smoke-Test a Bundled Python Calculator (Requires `financial-analyst` Skill)
 

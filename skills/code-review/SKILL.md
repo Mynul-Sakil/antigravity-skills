@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: "Code review — local uncommitted changes or GitHub PR (pass PR number/URL for PR mode). Use for a step-by-step PRP-style checklist review; for a multi-agent pass use /review-pr, and for the adversarially-verified Workflow pass use /orch-review."
+description: "Comprehensive local diff and Pull Request review for bugs, blast radius, security (OWASP Top 10), architecture, and maintainability with merge verdicts. Includes Python PR/code analyzers (pr_analyzer.py, code_quality_checker.py, review_report_generator.py) and 13 language rulepacks."
 ---
 
 # Code Review
@@ -287,3 +287,20 @@ Next steps:
 - **No `gh` CLI**: Fall back to local-only review (read the diff, skip GitHub publish). Warn user.
 - **Diverged branches**: Suggest `git fetch origin && git rebase origin/<base>` before review.
 - **Large PRs (>50 files)**: Warn about review scope. Focus on source changes first, then tests, then config/docs.
+
+
+---
+
+## Pull Request & Blast-Radius Review Mode (`/review-pr` / PR URLs / Branch Diffs)
+
+When reviewing a GitHub/GitLab Pull Request (`gh pr view <num>`, `gh pr diff <num>`) or full branch diff (`git diff main...HEAD`):
+
+1. **Map Blast Radius First:** Identify callers, downstream consumers, DB migrations, auth boundaries, and breaking API changes before line-by-line style comments.
+2. **Load Language-Specific Rules:** Check `languages/<lang>.md` (`typescript`, `python`, `go`, `rust`, `java`, `csharp`, `cpp`, `c`, `kotlin`, `swift`, `dart`, `php`, `ruby`) and `rules/universal.md`.
+3. **Run Bundled Static Analyzers (Zero-Dependency Python 3):**
+   ```bash
+   python3 scripts/code_quality_checker.py <target-path> --output quality.json
+   python3 scripts/pr_analyzer.py --diff <diff-file-or-dir>
+   python3 scripts/review_report_generator.py quality.json
+   ```
+4. **Emit Merge Verdict:** Conclude with an explicit **`APPROVE`**, **`APPROVE WITH WARNINGS`**, or **`REQUEST CHANGES (BLOCK)`** verdict — see [references/pr-blast-radius-and-verdict.md](references/pr-blast-radius-and-verdict.md) for the complete PR checklist and multi-agent review rubric.

@@ -1,6 +1,6 @@
 ---
 name: session-handoff
-description: "Write a handoff document so a fresh session or another agent can pick up exactly where this one left off: goal, current state, decisions, next steps and the skills to load, referencing existing files instead of copying them, with secrets redacted before saving. Use whenever the user is ending a session, switching machines, running low on context, or asks for a handoff, a handoff doc, a 'pick up where we left off' summary, or to compact the conversation for next time. Saves to a location the user picks on first run (OS temp, home folder or per-project .handoff/) and can auto-load the latest handoff at the next session start."
+description: "Use when ending a session (/handoff or /session-handoff) or handing work to the next agent/context window. Write a handoff document so a fresh session or another agent can pick up exactly where this one left off: goal, current state, decisions, next steps and the skills to load, referencing existing files instead of copying them, with secrets redacted before saving. Use whenever the user is ending a session, switching machines, running low on context, or asks for a handoff, a handoff doc, a 'pick up where we left off' summary, or to compact the conversation for next time. Saves to a location the user picks on first run (OS temp, home folder or per-project .handoff/) and can auto-load the latest handoff at the next session start."
 license: MIT
 argument-hint: "What will the next session be used for?"
 metadata:
@@ -195,3 +195,7 @@ On the next session, the SessionStart hook scans the configured save location, f
 
 **Version:** 1.0.0
 **Inspired by:** [Matt Pocock's handoff](https://github.com/mattpocock/skills/tree/main/skills/productivity/handoff) (MIT).
+
+### Additional Companion Tooling
+- `scripts/artifact_deduplicator.py` — Deduplicates overlapping artifacts before writing the handoff summary
+- [references/next_session_skill_matching.md](references/next_session_skill_matching.md) — Matching open tasks to recommended next-session skills

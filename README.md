@@ -1,11 +1,11 @@
 # Antigravity Skills, Subagents & Rules
 
-[![Skills](https://img.shields.io/badge/Skills-576-10b981?style=for-the-badge)](#domain-highlights-576-skills)
+[![Skills](https://img.shields.io/badge/Skills-526-10b981?style=for-the-badge)](#domain-highlights-526-skills)
 [![Subagents](https://img.shields.io/badge/Subagents-25-3b82f6?style=for-the-badge)](#25-native-subagents)
 [![Rules](https://img.shields.io/badge/Rules-100-8b5cf6?style=for-the-badge)](#how-it-works)
 [![Agents](https://img.shields.io/badge/Works_With-Antigravity_%26_Claude_Code-f59e0b?style=for-the-badge)](./INSTALLATION.md)
 
-A unified, production-ready customization pack for **Antigravity** (and **Claude Code**) featuring **576 on-demand skills**, **25 specialist subagents**, and **100 context-aware engineering rules** — with **selective sparse-checkout installation** so you can install the lean **Minimal Core** (default), **a single skill**, **a role pack**, or **all 576 skills**.
+A unified, production-ready customization pack for **Antigravity** (and **Claude Code**) featuring **526 on-demand skills**, **25 specialist subagents**, and **100 context-aware engineering rules** — with **selective sparse-checkout installation** so you can install the lean **Minimal Core** (default), **a single skill**, **a role pack**, or **all 526 skills**.
 
 ---
 
@@ -13,10 +13,10 @@ A unified, production-ready customization pack for **Antigravity** (and **Claude
 
 | Mode | CLI Flag | What Gets Installed | Downloads Whole Repo? |
 | :--- | :--- | :--- | :---: |
-| **Minimal *(Default)*** | *(none)* or `--minimal` | **19** daily core skills, **8** core subagents, **8** core rules | **No** (sparse fetch) |
+| **Minimal *(Default)*** | *(none)* or `--minimal` | **17** daily core skills, **8** core subagents, **8** core rules | **No** (sparse fetch) |
 | **Specific Skill(s)** | `--skill <name>` | **Only** the requested skill folder(s) (`SKILL.md` + `scripts/` + `references/`) | **No** (sparse fetch) |
 | **Role Pack** | `--role <role>` | Curated pack (`frontend`, `backend`, `fullstack`, `qa`, `security`, `devops`, `ai-ml`, `finance`, `product`, `marketing`, `founder`) | **No** (sparse fetch) |
-| **Full Catalog** | `--all` | All **576** skills, **25** subagents, and **100** rules | Yes |
+| **Full Catalog** | `--all` | All **526** skills, **25** subagents, and **100** rules | Yes |
 
 ---
 
@@ -30,7 +30,7 @@ curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main
 
 ---
 
-### 1. Antigravity — Minimal Install *(Default: 19 Core Skills, 8 Subagents, 8 Rules)*
+### 1. Antigravity — Minimal Install *(Default: 17 Core Skills, 8 Subagents, 8 Rules)*
 
 **Current Project Directory (`./.agents`):**
 
@@ -88,7 +88,7 @@ curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main
 
 ---
 
-### 4. Antigravity — Full Catalog (`--all`: All 576 Skills, 25 Subagents, 100 Rules)
+### 4. Antigravity — Full Catalog (`--all`: All 526 Skills, 25 Subagents, 100 Rules)
 
 **Current Project Directory (`./.agents`):**
 
@@ -124,7 +124,7 @@ curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main
 curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --claude --local --skill stock-analysis
 ```
 
-**Claude Code — Install All 576 Skills Globally:**
+**Claude Code — Install All 526 Skills Globally:**
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --claude --global --all
@@ -150,31 +150,31 @@ This repository is built natively around **Progressive Disclosure** so you get d
 
 | Component | Folder | Total Available | How It Loads | Context Cost |
 | :--- | :--- | :---: | :--- | :--- |
-| **Skills & Slash Workflows** | `skills/<name>/SKILL.md` | **576** | Type `/<name>` in chat **or** ask in plain English | Full `SKILL.md`, `references/`, and `scripts/` load **only when activated** |
+| **Skills & Slash Workflows** | `skills/<name>/SKILL.md` | **526** | Type `/<name>` in chat **or** ask in plain English | Full `SKILL.md`, `references/`, and `scripts/` load **only when activated** |
 | **Specialist Subagents** | `agents/<name>.md` | **25** | Delegated via `invoke_subagent` (`subagent: true`) | Runs in an **isolated subagent context**; sized to keep built-in `browser` & `research` active |
 | **Core Engineering Rules** | `rules/common-*.md` | **8** (+1 optional) | `trigger: always_on` | Compact baseline (immutability, TDD, security, code review, git workflow) |
 | **Language & Stack Rules** | `rules/<stack>-*.md` | **91** | `trigger: glob` (e.g. `**/*.ts`, `**/*.py`) | **Zero tokens** until you open or edit matching files |
 
 ---
 
-## Domain Highlights (576 Skills)
+## Domain Highlights (526 Skills)
 
 Every skill includes structured workflows, reference checklists, and (where applicable) **zero-dependency Python 3 CLI tools** (`scripts/*.py`, stdlib-only). All skills work as `/<skill-name>` slash commands:
 
 | Domain | Representative `/slash` Skills |
 | :--- | :--- |
-| **Architecture & Specs** | `/plan`, `/multi-plan`, `/plan-prd`, `/prp-plan`, `/database-schema-designer`, `/api-design`, `/codebase-onboarding`, `/tech-debt-tracker`, `/monorepo-navigator` |
+| **Architecture & Specs** | `/plan`, `/multi-plan`, `/plan-prd`, `/database-schema-designer`, `/api-design`, `/codebase-onboarding`, `/tech-debt-tracker`, `/monorepo-navigator` |
 | **Full-Stack & Languages** | `/nextjs-best-practices`, `/nextjs-turbopack`, `/bun-runtime`, `/react-review`, `/fastapi-review`, `/python-review`, `/go-review`, `/rust-review`, `/flutter-review` |
-| **TDD, QA & Playwright** | `/tdd-workflow`, `/pw`, `/pw-init`, `/playtest`, `/react-test`, `/api-test-suite-builder`, `/test-coverage`, `/build-fix` |
-| **Multi-Agent Orchestration** | `/orch-add-feature`, `/orch-fix-defect`, `/orch-refine-code`, `/gan-build`, `/gan-design`, `/santa-loop`, `/council`, `/hub-run` |
-| **Git, PR & DevOps** | `/pr`, `/pr-review-expert`, `/git-sync`, `/deploy-verify`, `/runbook-generator`, `/pm2`, `/quality-gate` |
-| **Security & AI Safety** | `/senior-security`, `/ai-security`, `/red-team`, `/threat-detection`, `/soc2-compliance`, `/gdpr-audit-prep`, `/ai-act-readiness` |
+| **TDD, QA & Playwright** | `/tdd-workflow`, `/pw`, `/e2e-testing`, `/playtest`, `/react-test`, `/api-test-suite-builder`, `/test-coverage`, `/build-fix` |
+| **Multi-Agent Orchestration** | `/orch-workflow`, `/gan-build`, `/gan-design`, `/santa-method`, `/council`, `/hub-run` |
+| **Git, PR & DevOps** | `/pr`, `/code-review`, `/git-sync`, `/deploy-verify`, `/runbook-generator`, `/pm2`, `/quality-gate` |
+| **Security & AI Safety** | `/senior-security`, `/ai-security`, `/red-team`, `/threat-detection`, `/soc2-compliance`, `/gdpr-dsgvo-expert`, `/eu-ai-act-specialist` |
 | **Stock, Finance & Valuation** | `/stock-analysis`, `/financial-analyst`, `/passive-deal-screener`, `/business-investment-advisor`, `/cfo-advisor` |
 | **Deep Research & Intel** | `/deep-research`, `/exa-search`, `/pulse`, `/competitive-intel`, `/graphify` |
-| **Product & Agile Delivery** | `/agile-product-owner`, `/product-discovery`, `/product-strategist`, `/product-analytics`, `/experiment-designer`, `/jira` |
+| **Product & Agile Delivery** | `/agile-product-owner`, `/product-discovery`, `/product-strategist`, `/product-analytics`, `/experiment-designer`, `/jira-expert` |
 | **C-Suite & Strategy** | `/boardroom`, `/ceo-advisor`, `/cto-review`, `/cpo-review`, `/challenge`, `/stress-test`, `/hard-call`, `/scenario-war-room` |
 | **Marketing, SEO & CRO** | `/seo-audit`, `/page-cro`, `/signup-flow-cro`, `/form-cro`, `/pricing-strategy`, `/launch-strategy`, `/social-content` |
-| **Daily Productivity** | `/today-summary`, `/weekly-presentation-organizer`, `/rewrite`, `/prompt-engineer`, `/save-session`, `/resume-session` |
+| **Daily Productivity** | `/today-summary`, `/weekly-presentation-organizer`, `/rewrite`, `/prompt-engineer`, `/sessions`, `/session-handoff` |
 
 ---
 
@@ -207,7 +207,7 @@ Configured in `agents/*.md` using Antigravity's native schema (`subagent: true`,
 You don't have to memorize skill names — just ask naturally:
 - *"Value this SaaS business with a 5-year DCF and sensitivity table"* -> activates `financial-analyst`
 - *"Audit our signup form for conversion drop-off"* -> activates `signup-flow-cro`
-- *"Check if our AI feature falls under high-risk EU AI Act tiers"* -> activates `ai-act-readiness`
+- *"Check if our AI feature falls under high-risk EU AI Act tiers"* -> activates `eu-ai-act-specialist`
 
 ### 3. Run Bundled Zero-Dependency Python CLI Calculators
 
@@ -223,7 +223,7 @@ python3 .agents/skills/financial-analyst/scripts/ratio_calculator.py .agents/ski
 
 ```text
 antigravity-skills/
-├── skills/          # 576 modular skills (<name>/SKILL.md + scripts/ + references/ + assets/)
+├── skills/          # 526 modular skills (<name>/SKILL.md + scripts/ + references/ + assets/)
 ├── agents/          # 25 native Antigravity specialist subagents
 ├── rules/           # 100 rules (9 always_on core rules + 91 glob-triggered stack rules)
 ├── profiles.json    # Declarative catalog for 'minimal' default & 11 '--role' packs

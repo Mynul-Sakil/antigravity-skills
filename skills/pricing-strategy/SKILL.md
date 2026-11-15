@@ -1,12 +1,6 @@
 ---
-name: "pricing-strategy"
-description: "Use for SaaS pricing tiers, value metric, packaging, a pricing page or a price increase, before proposing numbers. Models revenue across tier options with pricing_modeler.py."
-license: MIT
-metadata:
-  version: 1.0.0
-  author: Alireza Rezvani
-  category: marketing
-  updated: 2026-03-06
+name: pricing-strategy
+description: "Design SaaS pricing, value metrics, Good-Better-Best tiers, Van Westendorp WTP surveys, and price-increase rollouts. Runs pricing_modeler.py, wtp_analyzer.py, pricing_model_picker.py, and packaging_designer.py."
 ---
 
 # Pricing Strategy
@@ -318,6 +312,28 @@ All output follows the structured communication standard:
 - **product-strategist**: Use for product roadmap and broader monetization strategy. NOT for pricing page or price increase execution.
 - **copywriting**: Use for pricing page copy polish. NOT for pricing structure or tier design.
 - **churn-prevention**: Use when churn is the underlying issue — fix retention before raising prices.
-- **ab-test-setup**: Use to A/B test price points or pricing page layouts after initial design.
+- **experiment-designer**: Use to A/B test price points or pricing page layouts after initial design.
 - **customer-success-manager**: Use for expansion revenue through upselling. NOT for pricing design or packaging.
 - **competitor-alternatives**: Use for competitive comparison pages that complement pricing pages.
+
+
+---
+
+## Additional Bundled Pricing & WTP Python Calculators
+
+```bash
+# Van Westendorp Price Sensitivity Meter (OPP, IPP, PMC, PME)
+python3 scripts/wtp_analyzer.py --help
+
+# Value-metric & pricing-model selector (seat vs usage vs hybrid vs outcome)
+python3 scripts/pricing_model_picker.py --help
+
+# Good-Better-Best tier packaging & feature-gate analyzer
+python3 scripts/packaging_designer.py --help
+```
+
+### Additional References & Templates
+- [references/van_westendorp_methodology.md](references/van_westendorp_methodology.md) — Willingness-to-pay survey & analysis methodology
+- [references/packaging_anti_patterns.md](references/packaging_anti_patterns.md) — SaaS tier & feature-gating anti-patterns
+- [references/saas_pricing_canon.md](references/saas_pricing_canon.md) — Core B2B SaaS pricing benchmarks
+- [assets/pricing_brief_template.md](assets/pricing_brief_template.md) — Executive pricing brief template

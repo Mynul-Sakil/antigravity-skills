@@ -53,9 +53,9 @@ The numerate skeptic stress-tests anything that touches money. Six questions bef
 
 1. **Run the numbers:**
    ```bash
-   python ${CLAUDE_PLUGIN_ROOT}/vendor/c-level-advisor/cfo-advisor/scripts/burn_rate_calculator.py
-   python ${CLAUDE_PLUGIN_ROOT}/vendor/c-level-advisor/cfo-advisor/scripts/unit_economics_analyzer.py
-   python ${CLAUDE_PLUGIN_ROOT}/vendor/c-level-advisor/cfo-advisor/scripts/fundraising_model.py
+   python ../scripts/burn_rate_calculator.py
+   python ../scripts/unit_economics_analyzer.py
+   python ../scripts/fundraising_model.py
    ```
 2. **Answer all six questions** with numbers, not adjectives.
 3. **Apply the verdict:**
@@ -98,7 +98,7 @@ The numerate skeptic stress-tests anything that touches money. Six questions bef
 ## Related
 
 - Agent: [`cs-cfo-advisor`](../../agents/cs-cfo-advisor.md)
-- Skill: [`cfo-advisor`](${CLAUDE_PLUGIN_ROOT}/vendor/c-level-advisor/cfo-advisor/SKILL.md)
+- Skill: [`cfo-advisor`](../cfo-advisor/SKILL.md)
 
 ---
 

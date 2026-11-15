@@ -111,7 +111,7 @@ This is also the **artifact handoff** — the next command consumes this file, n
 ## Related
 
 - Agent: [`cs-chief-of-staff`](../../agents/cs-chief-of-staff.md)
-- Skills: [`context-engine`](${CLAUDE_PLUGIN_ROOT}/vendor/c-level-advisor/context-engine/SKILL.md), [`board-meeting`](${CLAUDE_PLUGIN_ROOT}/vendor/c-level-advisor/board-meeting/SKILL.md)
+- Skills: [`context-engine`](../cs-onboard/SKILL.md), [`board-meeting`](../board-meeting/SKILL.md)
 
 ---
 

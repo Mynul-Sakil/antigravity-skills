@@ -1,6 +1,6 @@
 ---
 name: plan
-description: "Restate requirements, assess risks, and create step-by-step implementation plan. WAIT for user CONFIRM before touching any code. Use for a single-model inline or PRD-driven implementation plan; for a dual-model (Codex/Antigravity) plan use /multi-plan, and for visual annotate-and-approve review of the resulting plan use /plan-canvas."
+description: "Create comprehensive implementation plans before writing code: restate requirements, extract codebase patterns across 8 categories, design phased file-level tasks, assess risks, and wait for user confirmation."
 ---
 
 # Plan Command
@@ -204,3 +204,10 @@ If the `planner` subagent is unavailable, continue planning inline instead of su
 
 For manual installs, the source file lives at:
 `agents/planner.md`
+
+
+---
+
+## Deep Codebase Pattern Extraction & Validation Loops
+
+For multi-file features or unfamiliar repositories, run structured codebase pattern extraction (naming, error handling, types, testing conventions, validation, state, integration points, and gotchas) with 5-level validation gates — see [references/deep-pattern-extraction.md](references/deep-pattern-extraction.md). *(For dual-model adversarial planning, use `/multi-plan`.)*

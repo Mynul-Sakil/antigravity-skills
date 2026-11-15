@@ -1,104 +1,339 @@
 ---
 name: experiment-designer
-description: "Plan A/B tests and product experiments: hypotheses, sample size, priority, reading results. Use whenever the user asks if a test won, how long to run it or what to test."
+description: "Plan, prioritize (ICE), size, launch, and interpret A/B, split, and multivariate product experiments: hypothesis framing, sample-size & duration calculators, guardrail metrics, peeking protection, and significance analysis."
 ---
 
-# Experiment Designer
+# Experiment Designer & A/B Test Setup
 
-Design, prioritize, and evaluate product experiments with clear hypotheses and defensible decisions.
+Design statistically valid product and conversion experiments with pre-registered hypotheses, sample-size calculations,ICE prioritization, and rigorous post-test decision rules.
 
-## When To Use
+## Bundled Sample-Size Calculators (Stdlib Python 3)
 
-Use this skill for:
-- A/B and multivariate experiment planning
-- Hypothesis writing and success criteria definition
-- Sample size and minimum detectable effect planning
-- Experiment prioritization with ICE scoring
-- Reading statistical output for product decisions
-
-## Core Workflow
-
-1. Write hypothesis in If/Then/Because format
-- If we change `[intervention]`
-- Then `[metric]` will change by `[expected direction/magnitude]`
-- Because `[behavioral mechanism]`
-
-2. Define metrics before running test
-- Primary metric: single decision metric
-- Guardrail metrics: quality/risk protection
-- Secondary metrics: diagnostics only
-
-3. Estimate sample size
-- Baseline conversion or baseline mean
-- Minimum detectable effect (MDE)
-- Significance level (alpha) and power
-
-Use:
 ```bash
-python3 scripts/sample_size_calculator.py --baseline-rate 0.12 --mde 0.02 --mde-type absolute
+# Calculator 1: Conversion lift + daily traffic duration + JSON pipeline output
+python3 scripts/ab_sample_size_calculator.py --baseline 0.05 --mde 0.20 --daily-traffic 2000
+python3 scripts/ab_sample_size_calculator.py --baseline 0.05 --mde 0.20 --json
+
+# Calculator 2: Explicit absolute vs relative MDE with custom alpha/power
+python3 scripts/sample_size_calculator.py --baseline-rate 0.10 --mde 0.015 --mde-type absolute --alpha 0.05 --power 0.8
 ```
 
-4. Prioritize experiments with ICE
-- Impact: potential upside
-- Confidence: evidence quality
-- Ease: cost/speed/complexity
+## ICE Experiment Prioritization
 
-ICE Score = (Impact * Confidence * Ease) / 10
+Rank candidate experiments before committing engineering/traffic:
+`ICE Score = (Impact [1-10] * Confidence [1-10] * Ease [1-10]) / 10`
 
-5. Launch with stopping rules
-- Decide fixed sample size or fixed duration in advance
-- Avoid repeated peeking without proper method
-- Monitor guardrails continuously
+---
 
-6. Interpret results
-- Statistical significance is not business significance
-- Compare point estimate + confidence interval to decision threshold
-- Investigate novelty effects and segment heterogeneity
+# A/B Test Setup
 
-## Hypothesis Quality Checklist
+You are an expert in experimentation and A/B testing. Your goal is to help design tests that produce statistically valid, actionable results.
 
-- [ ] Contains explicit intervention and audience
-- [ ] Specifies measurable metric change
-- [ ] States plausible causal reason
-- [ ] Includes expected minimum effect
-- [ ] Defines failure condition
+## Initial Assessment
 
-## Common Experiment Pitfalls
+**Check for product marketing context first:**
+If `.claude/product-marketing-context.md` exists, read it before asking questions. Use that context and only ask for information not already covered or specific to this task.
 
-- Underpowered tests leading to false negatives
-- Running too many simultaneous changes without isolation
-- Changing targeting or implementation mid-test
-- Stopping early on random spikes
-- Ignoring sample ratio mismatch and instrumentation drift
-- Declaring success from p-value without effect-size context
+Before designing a test, understand:
 
-## Statistical Interpretation Guardrails
+1. **Test Context** - What are you trying to improve? What change are you considering?
+2. **Current State** - Baseline conversion rate? Current traffic volume?
+3. **Constraints** - Technical complexity? Timeline? Tools available?
 
-- p-value < alpha indicates evidence against null, not guaranteed truth.
-- Confidence interval crossing zero/no-effect means uncertain directional claim.
-- Wide intervals imply low precision even when significant.
-- Use practical significance thresholds tied to business impact.
+---
 
-See:
-- `references/experiment-playbook.md`
-- `references/statistics-reference.md`
+## Core Principles
 
-## Tooling
+### 1. Start with a Hypothesis
+- Not just "let's see what happens"
+- Specific prediction of outcome
+- Based on reasoning or data
 
-### `scripts/sample_size_calculator.py`
+### 2. Test One Thing
+- Single variable per test
+- Otherwise you don't know what worked
 
-Computes required sample size (per variant and total) from:
-- baseline rate
-- MDE (absolute or relative)
-- significance level (alpha)
-- statistical power
+### 3. Statistical Rigor
+- Pre-determine sample size
+- Don't peek and stop early
+- Commit to the methodology
 
-Example:
-```bash
-python3 scripts/sample_size_calculator.py \
-  --baseline-rate 0.10 \
-  --mde 0.015 \
-  --mde-type absolute \
-  --alpha 0.05 \
-  --power 0.8
+### 4. Measure What Matters
+- Primary metric tied to business value
+- Secondary metrics for context
+- Guardrail metrics to prevent harm
+
+---
+
+## Hypothesis Framework
+
+### Structure
+
 ```
+Because [observation/data],
+we believe [change]
+will cause [expected outcome]
+for [audience].
+We'll know this is true when [metrics].
+```
+
+### Example
+
+**Weak**: "Changing the button color might increase clicks."
+
+**Strong**: "Because users report difficulty finding the CTA (per heatmaps and feedback), we believe making the button larger and using contrasting color will increase CTA clicks by 15%+ for new visitors. We'll measure click-through rate from page view to signup start."
+
+---
+
+## Test Types
+
+| Type | Description | Traffic Needed |
+|------|-------------|----------------|
+| A/B | Two versions, single change | Moderate |
+| A/B/n | Multiple variants | Higher |
+| MVT | Multiple changes in combinations | Very high |
+| Split URL | Different URLs for variants | Moderate |
+
+---
+
+## Sample Size
+
+### Calculate It (bundled tool)
+
+Use this skill's own calculator — don't eyeball it:
+
+```bash
+python3 scripts/ab_sample_size_calculator.py --baseline 0.05 --mde 0.20            # human-readable
+python3 scripts/ab_sample_size_calculator.py --baseline 0.05 --mde 0.20 --json    # for pipelines
+python3 scripts/ab_sample_size_calculator.py --baseline 0.05 --mde 0.20 --daily-traffic 2000  # adds test-duration estimate
+```
+
+Paste `sample_size_per_variation` and the duration estimate directly into the test plan's "Sample size + duration" row before any test is approved to run.
+
+### Quick Reference
+
+Generated by `sample_size_calculator.py` (two-proportion z-test, α=0.05 two-tailed, 80% power; relative MDE):
+
+| Baseline | 10% Lift | 20% Lift | 50% Lift |
+|----------|----------|----------|----------|
+| 1% | 163k/variant | 43k/variant | 7.7k/variant |
+| 3% | 53k/variant | 14k/variant | 2.5k/variant |
+| 5% | 31k/variant | 8.2k/variant | 1.5k/variant |
+| 10% | 15k/variant | 3.8k/variant | 683/variant |
+
+**Cross-check calculators** (should agree with the script within rounding):
+- [Evan Miller's](https://www.evanmiller.org/ab-testing/sample-size.html)
+- [Optimizely's](https://www.optimizely.com/sample-size-calculator/)
+
+**For detailed sample size tables and duration calculations**: See [references/sample-size-guide.md](references/sample-size-guide.md)
+
+---
+
+## Metrics Selection
+
+### Primary Metric
+- Single metric that matters most
+- Directly tied to hypothesis
+- What you'll use to call the test
+
+### Secondary Metrics
+- Support primary metric interpretation
+- Explain why/how the change worked
+
+### Guardrail Metrics
+- Things that shouldn't get worse
+- Stop test if significantly negative
+
+### Example: Pricing Page Test
+- **Primary**: Plan selection rate
+- **Secondary**: Time on page, plan distribution
+- **Guardrail**: Support tickets, refund rate
+
+---
+
+## Designing Variants
+
+### What to Vary
+
+| Category | Examples |
+|----------|----------|
+| Headlines/Copy | Message angle, value prop, specificity, tone |
+| Visual Design | Layout, color, images, hierarchy |
+| CTA | Button copy, size, placement, number |
+| Content | Information included, order, amount, social proof |
+
+### Best Practices
+- Single, meaningful change
+- Bold enough to make a difference
+- True to the hypothesis
+
+---
+
+## Traffic Allocation
+
+| Approach | Split | When to Use |
+|----------|-------|-------------|
+| Standard | 50/50 | Default for A/B |
+| Conservative | 90/10, 80/20 | Limit risk of bad variant |
+| Ramping | Start small, increase | Technical risk mitigation |
+
+**Considerations:**
+- Consistency: Users see same variant on return
+- Balanced exposure across time of day/week
+
+---
+
+## Implementation
+
+### Client-Side
+- JavaScript modifies page after load
+- Quick to implement, can cause flicker
+- Tools: PostHog, Optimizely, VWO
+
+### Server-Side
+- Variant determined before render
+- No flicker, requires dev work
+- Tools: PostHog, LaunchDarkly, Split
+
+---
+
+## Running the Test
+
+### Pre-Launch Checklist
+- [ ] Hypothesis documented
+- [ ] Primary metric defined
+- [ ] Sample size calculated
+- [ ] Variants implemented correctly
+- [ ] Tracking verified
+- [ ] QA completed on all variants
+
+### During the Test
+
+**DO:**
+- Monitor for technical issues
+- Check segment quality
+- Document external factors
+
+**DON'T:**
+- Peek at results and stop early
+- Make changes to variants
+- Add traffic from new sources
+
+### The Peeking Problem
+Looking at results before reaching sample size and stopping early leads to false positives and wrong decisions. Pre-commit to sample size and trust the process.
+
+---
+
+## Analyzing Results
+
+### Statistical Significance
+- 95% confidence = p-value < 0.05
+- Means <5% chance result is random
+- Not a guarantee—just a threshold
+
+### Analysis Checklist
+
+1. **Reach sample size?** If not, result is preliminary
+2. **Statistically significant?** Check confidence intervals
+3. **Effect size meaningful?** Compare to MDE, project impact
+4. **Secondary metrics consistent?** Support the primary?
+5. **Guardrail concerns?** Anything get worse?
+6. **Segment differences?** Mobile vs. desktop? New vs. returning?
+
+### Interpreting Results
+
+| Result | Conclusion |
+|--------|------------|
+| Significant winner | Implement variant |
+| Significant loser | Keep control, learn why |
+| No significant difference | Need more traffic or bolder test |
+| Mixed signals | Dig deeper, maybe segment |
+
+---
+
+## Documentation
+
+Document every test with:
+- Hypothesis
+- Variants (with screenshots)
+- Results (sample, metrics, significance)
+- Decision and learnings
+
+**For templates**: See [references/test-templates.md](references/test-templates.md)
+
+---
+
+## Common Mistakes
+
+### Test Design
+- Testing too small a change (undetectable)
+- Testing too many things (can't isolate)
+- No clear hypothesis
+
+### Execution
+- Stopping early
+- Changing things mid-test
+- Not checking implementation
+
+### Analysis
+- Ignoring confidence intervals
+- Cherry-picking segments
+- Over-interpreting inconclusive results
+
+---
+
+## Task-Specific Questions
+
+1. What's your current conversion rate?
+2. How much traffic does this page get?
+3. What change are you considering and why?
+4. What's the smallest improvement worth detecting?
+5. What tools do you have for testing?
+6. Have you tested this area before?
+
+---
+
+## Proactive Triggers
+
+Proactively offer A/B test design when:
+
+1. **Conversion rate mentioned** — User shares a conversion rate and asks how to improve it; suggest designing a test rather than guessing at solutions.
+2. **Copy or design decision is unclear** — When two variants of a headline, CTA, or layout are being debated, propose testing instead of opinionating.
+3. **Campaign underperformance** — User reports a landing page or email performing below expectations; offer a structured test plan.
+4. **Pricing page discussion** — Any mention of pricing page changes should trigger an offer to design a pricing test with guardrail metrics.
+5. **Post-launch review** — After a feature or campaign goes live, propose follow-up experiments to optimize the result.
+
+---
+
+## Output Artifacts
+
+| Artifact | Format | Description |
+|----------|--------|-------------|
+| Experiment Brief | Markdown doc | Hypothesis, variants, metrics, sample size, duration, owner |
+| Sample Size Calculator Input | Table | Baseline rate, MDE, confidence level, power |
+| Pre-Launch QA Checklist | Checklist | Implementation, tracking, variant rendering verification |
+| Results Analysis Report | Markdown doc | Statistical significance, effect size, segment breakdown, decision |
+| Test Backlog | Prioritized list | Ranked experiments by expected impact and feasibility |
+
+---
+
+## Communication
+
+All outputs should meet the quality standard: clear hypothesis, pre-registered metrics, and documented decisions. Avoid presenting inconclusive results as wins. Every test should produce a learning, even if the variant loses. Reference `marketing-context` for product and audience framing before designing experiments.
+
+---
+
+## Related Skills
+
+- **page-cro** — USE when you need ideas for *what* to test; NOT when you already have a hypothesis and just need test design.
+- **analytics-tracking** — USE to set up measurement infrastructure before running tests; NOT as a substitute for defining primary metrics upfront.
+- **campaign-analytics** — USE after tests conclude to fold results into broader campaign attribution; NOT during the test itself.
+- **pricing-strategy** — USE when test results affect pricing decisions; NOT to replace a controlled test with pure strategic reasoning.
+- **marketing-context** — USE as foundation before any test design to ensure hypotheses align with ICP and positioning; always load first.
+
+
+## Additional References
+- [references/experiment-playbook.md](references/experiment-playbook.md) — End-to-end product experimentation playbook
+- [references/statistics-reference.md](references/statistics-reference.md) — Power, alpha, MDE, SRM, and confidence interval guardrails
+- [references/sample-size-guide.md](references/sample-size-guide.md) — Detailed sample-size & duration tables
+- [references/test-templates.md](references/test-templates.md) — Experiment brief & readout templates

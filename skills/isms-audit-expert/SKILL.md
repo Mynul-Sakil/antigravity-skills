@@ -1,17 +1,6 @@
 ---
-name: "isms-audit-expert"
-description: "Use for ISO 27001 audit work: internal or surveillance audits, Annex A control evidence, Statement of Applicability, nonconformities, Stage 1 and 2 prep. Plans risk-based audits with isms_audit_scheduler.py."
-metadata:
-  triggers:
-    - ISMS audit
-    - ISO 27001 audit
-    - security audit
-    - internal audit ISO 27001
-    - security control assessment
-    - certification audit
-    - surveillance audit
-    - audit finding
-    - nonconformity
+name: isms-audit-expert
+description: "Implement and audit ISO/IEC 27001:2022 Information Security Management Systems (ISMS): risk assessment (risk_assessment.py), Annex A control checking (compliance_checker.py), risk-based audit scheduling (isms_audit_scheduler.py), and Stage 1/2 & surveillance audit prep."
 ---
 
 # ISMS Audit Expert
@@ -239,3 +228,498 @@ python scripts/isms_audit_scheduler.py --controls controls.csv --format markdown
 Load these only when the task needs them.
 
 - [references/iso27001_audit_playbook.md](references/iso27001_audit_playbook.md) — ISO/IEC 27001:2022 Internal Audit Playbook
+
+
+---
+
+## ISMS Implementation, Risk Assessment & Incident Response (`risk_assessment.py` & `compliance_checker.py`)
+
+# Information Security Manager - ISO 27001
+
+Implement and manage Information Security Management Systems (ISMS) aligned with ISO 27001:2022 and healthcare regulatory requirements.
+
+---
+
+## Table of Contents
+
+- [Trigger Phrases](#trigger-phrases)
+- [Quick Start](#quick-start)
+- [Tools](#tools)
+- [Workflows](#workflows)
+- [Reference Guides](#reference-guides)
+- [Validation Checkpoints](#validation-checkpoints)
+
+---
+
+## Trigger Phrases
+
+Use this skill when you hear:
+- "implement ISO 27001"
+- "ISMS implementation"
+- "security risk assessment"
+- "information security policy"
+- "ISO 27001 certification"
+- "security controls implementation"
+- "incident response plan"
+- "healthcare data security"
+- "medical device cybersecurity"
+- "security compliance audit"
+
+---
+
+## Quick Start
+
+### Run Security Risk Assessment
+
+```bash
+python scripts/risk_assessment.py --scope "patient-data-system" --output risk_register.json
+```
+
+### Check Compliance Status
+
+```bash
+python scripts/compliance_checker.py --standard iso27001 --controls-file controls.csv
+```
+
+### Generate Gap Analysis Report
+
+```bash
+python scripts/compliance_checker.py --standard iso27001 --gap-analysis --output gaps.md
+```
+
+---
+
+## Tools
+
+### risk_assessment.py
+
+Automated security risk assessment following ISO 27001 Clause 6.1.2 methodology.
+
+**Usage:**
+
+```bash
+# Full risk assessment
+python scripts/risk_assessment.py --scope "cloud-infrastructure" --output risks.json
+
+# Healthcare-specific assessment
+python scripts/risk_assessment.py --scope "ehr-system" --template healthcare --output risks.json
+
+# Quick asset-based assessment
+python scripts/risk_assessment.py --assets assets.csv --output risks.json
+```
+
+**Parameters:**
+
+| Parameter | Required | Description |
+|-----------|----------|-------------|
+| `--scope` | Yes | System or area to assess |
+| `--template` | No | Assessment template: `general`, `healthcare`, `cloud` |
+| `--assets` | No | CSV file with asset inventory |
+| `--output` | No | Output file (default: stdout) |
+| `--format` | No | Output format: `json`, `csv`, `markdown` |
+
+**Output:**
+- Asset inventory with classification
+- Threat and vulnerability mapping
+- Risk scores (likelihood × impact)
+- Treatment recommendations
+- Residual risk calculations
+
+### compliance_checker.py
+
+Verify ISO 27001/27002 control implementation status.
+
+**Usage:**
+
+```bash
+# Check all ISO 27001 controls
+python scripts/compliance_checker.py --standard iso27001
+
+# Gap analysis with recommendations
+python scripts/compliance_checker.py --standard iso27001 --gap-analysis
+
+# Check specific control domains
+python scripts/compliance_checker.py --standard iso27001 --domains "access-control,cryptography"
+
+# Export compliance report
+python scripts/compliance_checker.py --standard iso27001 --output compliance_report.md
+```
+
+**Parameters:**
+
+| Parameter | Required | Description |
+|-----------|----------|-------------|
+| `--standard` | Yes | Standard to check: `iso27001`, `iso27002`, `hipaa` |
+| `--controls-file` | No | CSV with current control status |
+| `--gap-analysis` | No | Include remediation recommendations |
+| `--domains` | No | Specific control domains to check |
+| `--output` | No | Output file path |
+
+**Output:**
+- Control implementation status
+- Compliance percentage by domain
+- Gap analysis with priorities
+- Remediation recommendations
+
+---
+
+## Workflows
+
+### Workflow 1: ISMS Implementation
+
+**Step 1: Define Scope and Context**
+
+Document organizational context and ISMS boundaries:
+- Identify interested parties and requirements
+- Define ISMS scope and boundaries
+- Document internal/external issues
+
+**Validation:** Scope statement reviewed and approved by management.
+
+**Step 2: Conduct Risk Assessment**
+
+```bash
+python scripts/risk_assessment.py --scope "full-organization" --template general --output initial_risks.json
+```
+
+- Identify information assets
+- Assess threats and vulnerabilities
+- Calculate risk levels
+- Determine risk treatment options
+
+**Validation:** Risk register contains all critical assets with assigned owners.
+
+**Step 3: Select and Implement Controls**
+
+Map risks to ISO 27002 controls:
+
+```bash
+python scripts/compliance_checker.py --standard iso27002 --gap-analysis --output control_gaps.md
+```
+
+Control categories:
+- Organizational (policies, roles, responsibilities)
+- People (screening, awareness, training)
+- Physical (perimeters, equipment, media)
+- Technological (access, crypto, network, application)
+
+**Validation:** Statement of Applicability (SoA) documents all controls with justification.
+
+**Step 4: Establish Monitoring**
+
+Define security metrics:
+- Incident count and severity trends
+- Control effectiveness scores
+- Training completion rates
+- Audit findings closure rate
+
+**Validation:** Dashboard shows real-time compliance status.
+
+### Workflow 2: Security Risk Assessment
+
+**Step 1: Asset Identification**
+
+Create asset inventory:
+
+| Asset Type | Examples | Classification |
+|------------|----------|----------------|
+| Information | Patient records, source code | Confidential |
+| Software | EHR system, APIs | Critical |
+| Hardware | Servers, medical devices | High |
+| Services | Cloud hosting, backup | High |
+| People | Admin accounts, developers | Varies |
+
+**Validation:** All assets have assigned owners and classifications.
+
+**Step 2: Threat Analysis**
+
+Identify threats per asset category:
+
+| Asset | Threats | Likelihood |
+|-------|---------|------------|
+| Patient data | Unauthorized access, breach | High |
+| Medical devices | Malware, tampering | Medium |
+| Cloud services | Misconfiguration, outage | Medium |
+| Credentials | Phishing, brute force | High |
+
+**Validation:** Threat model covers top-10 industry threats.
+
+**Step 3: Vulnerability Assessment**
+
+```bash
+python scripts/risk_assessment.py --scope "network-infrastructure" --output vuln_risks.json
+```
+
+Document vulnerabilities:
+- Technical (unpatched systems, weak configs)
+- Process (missing procedures, gaps)
+- People (lack of training, insider risk)
+
+**Validation:** Vulnerability scan results mapped to risk register.
+
+**Step 4: Risk Evaluation and Treatment**
+
+Calculate risk: `Risk = Likelihood × Impact`
+
+| Risk Level | Score | Treatment |
+|------------|-------|-----------|
+| Critical | 20-25 | Immediate action required |
+| High | 15-19 | Treatment plan within 30 days |
+| Medium | 10-14 | Treatment plan within 90 days |
+| Low | 5-9 | Accept or monitor |
+| Minimal | 1-4 | Accept |
+
+**Validation:** All high/critical risks have approved treatment plans.
+
+### Workflow 3: Incident Response
+
+**Step 1: Detection and Reporting**
+
+Incident categories:
+- Security breach (unauthorized access)
+- Malware infection
+- Data leakage
+- System compromise
+- Policy violation
+
+**Validation:** Incident logged within 15 minutes of detection.
+
+**Step 2: Triage and Classification**
+
+| Severity | Criteria | Response Time |
+|----------|----------|---------------|
+| Critical | Data breach, system down | Immediate |
+| High | Active threat, significant risk | 1 hour |
+| Medium | Contained threat, limited impact | 4 hours |
+| Low | Minor violation, no impact | 24 hours |
+
+**Validation:** Severity assigned and escalation triggered if needed.
+
+**Step 3: Containment and Eradication**
+
+Immediate actions:
+1. Isolate affected systems
+2. Preserve evidence
+3. Block threat vectors
+4. Remove malicious artifacts
+
+**Validation:** Containment confirmed, no ongoing compromise.
+
+**Step 4: Recovery and Lessons Learned**
+
+Post-incident activities:
+1. Restore systems from clean backups
+2. Verify integrity before reconnection
+3. Document timeline and actions
+4. Conduct post-incident review
+5. Update controls and procedures
+
+**Validation:** Post-incident report completed within 5 business days.
+
+---
+
+## Reference Guides
+
+### When to Use Each Reference
+
+**references/iso27001-controls.md**
+- Control selection for SoA
+- Implementation guidance
+- Evidence requirements
+- Audit preparation
+
+**references/risk-assessment-guide.md**
+- Risk methodology selection
+- Asset classification criteria
+- Threat modeling approaches
+- Risk calculation methods
+
+**references/incident-response.md**
+- Response procedures
+- Escalation matrices
+- Communication templates
+- Recovery checklists
+
+---
+
+## Validation Checkpoints
+
+### ISMS Implementation Validation
+
+| Phase | Checkpoint | Evidence Required |
+|-------|------------|-------------------|
+| Scope | Scope approved | Signed scope document |
+| Risk | Register complete | Risk register with owners |
+| Controls | SoA approved | Statement of Applicability |
+| Operation | Metrics active | Dashboard screenshots |
+| Audit | Internal audit done | Audit report |
+
+### Certification Readiness
+
+Before Stage 1 audit:
+- [ ] ISMS scope documented and approved
+- [ ] Information security policy published
+- [ ] Risk assessment completed
+- [ ] Statement of Applicability finalized
+- [ ] Internal audit conducted
+- [ ] Management review completed
+- [ ] Nonconformities addressed
+
+Before Stage 2 audit:
+- [ ] Controls implemented and operational
+- [ ] Evidence of effectiveness available
+- [ ] Staff trained and aware
+- [ ] Incidents logged and managed
+- [ ] Metrics collected for 3+ months
+
+### Compliance Verification
+
+Run periodic checks:
+
+```bash
+# Monthly compliance check
+python scripts/compliance_checker.py --standard iso27001 --output monthly_$(date +%Y%m).md
+
+# Quarterly gap analysis
+python scripts/compliance_checker.py --standard iso27001 --gap-analysis --output quarterly_gaps.md
+```
+
+---
+
+---
+
+## Stage 1 / Surveillance Audit Forcing Questions (`iso27001-audit-prep`)
+
+# /compliance-os:iso27001-audit-prep — ISO 27001 ISMS Audit Forcing Questions
+
+**Command:** `/compliance-os:iso27001-audit-prep <scope>`
+
+The ISO 27001 ISMS auditor pressure-tests any ISMS work. Six sample-driven questions before any internal audit, stage 1 readiness, or surveillance audit.
+
+## When to Run
+
+- Before annual Clause 9.2 internal audit
+- Before stage 1 / stage 2 ISO 27001 certification audit
+- Before surveillance audit (year 2 / year 3)
+- After material change to ISMS scope (new business unit, new product line, new SaaS adoption)
+- Post-incident (breach triggers ad-hoc ISMS audit)
+- Quarterly during high-growth phase
+
+## The Six ISMS Questions
+
+### 1. What's the audit scope, and is rolling 3-year coverage on track?
+**No 3-year coverage discipline, no defensible programme.**
+- Every Clause 4-10 + every applicable Annex A control must be audited at least once per 3-year cycle
+- Run `isms_audit_scheduler.py` in ``
+- Confirm auditor independence — no self-audit on any sample
+
+### 2. When was the risk register last refreshed, and are treatments linked to Annex A controls?
+**Stale risk register = certification finding.**
+- Quarterly refresh expected; annual minimum
+- Every high/critical risk must link to ≥ 1 Annex A control treating it
+- Residual risk acceptance documented + signed
+- Review against `iso27001_audit_playbook.md` for stage 1 expectations
+
+### 3. Show me the access review records — quarterly cadence, the last 4 quarters.
+**Most-cited finding area.**
+- Annex A.5.15 + A.8.2 + A.8.3 access controls
+- Sample real records pulled from Okta / IAM, not curated audit-prep packs
+- For each terminated employee in last 90 days: deprovisioning evidence within 24-hour SLA
+- Privileged access reviewed at finer granularity
+
+### 4. What's the supplier inventory + last review evidence?
+**Second-most-cited finding area.**
+- Annex A.5.19-A.5.21 supplier management
+- Critical SaaS suppliers reviewed at least annually
+- DPAs signed for personal-data sub-processors (cross-check with cs-dpo-gdpr)
+- AI-specific contract clauses where third-party AI services in use (cross-check with cs-aims-iso42001)
+
+### 5. Where's the incident response evidence + post-incident review?
+**A.5.24-27 + A.6.8 — high-stakes audit area.**
+- Severity definitions documented + consistently applied
+- Last 5 incidents have post-incident review (PIR) within 30-day SLA
+- GDPR Article 33 / 34 notification timing aligned with A.5.24 (cross-check with cs-dpo-gdpr)
+- Blameless retro culture; not punitive
+
+### 6. What's the management review cadence + inputs?
+**Clause 9.3 required inputs are prescriptive — easy to miss.**
+- Required inputs: audit results, risks, performance, nonconformities, opportunities
+- Schedule: annual minimum; quarterly preferred for mature programs
+- Outputs documented + tracked to closure
+- Integrated review across frameworks (per `multi_framework_audit_playbook.md`) preferred to separate reviews
+
+## Workflow
+
+```bash
+# 1. Audit programme planning
+python scripts/isms_audit_scheduler.py audit_scope.json
+
+# 2. Mock audit for readiness check
+python ../compliance-os/scripts/audit_simulator.py iso27001_scope.json
+
+# 3. Cross-framework reuse (SOC 2 = 75% overlap; ISO 42001 = 60% reuse)
+python ../compliance-os/scripts/cross_framework_mapper.py program.json
+```
+
+## Output Format
+
+```markdown
+# ISO 27001 Audit Prep: <scope>
+**Date:** YYYY-MM-DD
+
+## The Decision Being Made
+[programme-plan | finding-severity | cert-readiness | incident-followup]
+
+## Audit Programme Status
+- Clauses scheduled this year: <list>
+- Annex A controls scheduled: <count>
+- Rolling 3-year coverage: clean | gaps in <list>
+- Auditor independence: clean | issues in <list>
+
+## Risk Register Health
+- Last refresh: YYYY-MM-DD
+- High/critical risks without Annex A control link: N
+- Residual risk acceptance documentation: complete | gaps
+
+## High-Stakes Controls Status
+- A.5.15 + A.8.2 + A.8.3 access control: pass/fail with sample
+- A.5.19-A.5.21 supplier mgmt: pass/fail with sample
+- A.5.24-27 + A.6.8 incident response: pass/fail with sample
+- A.8.15-16 logging: pass/fail with sample
+
+## Management Review Status
+- Last review date: YYYY-MM-DD
+- Required Article 9.3 inputs present: yes/no
+- Open action items past due: N
+
+## Cross-Framework Impact
+- SOC 2 controls affected: <list>
+- ISO 42001 controls affected (if applicable): <list>
+- GDPR Article 32 controls affected: <list>
+
+## Verdict
+🟢 READY | 🟡 CLOSE-CRITICALS-FIRST | 🔴 NOT-READY
+
+## Top 3 Actions
+[3 concrete next steps with owner + corrective-action timeline]
+```
+
+## Routing
+
+- `/compliance-os:compliance-readiness` — for multi-framework view
+- `/compliance-os:soc2-audit-prep` — for SOC 2 cross-walk pair (75% overlap)
+- `/compliance-os:aims-audit` — for ISO 42001 AIMS cross-walk
+- `/compliance-os:gdpr-audit-prep` — for Article 32 organizational measures overlap
+- `/c-level-agents:ciso-review` — for executive cybersecurity strategy
+- `/c-level-agents:decide` — to log the verdict
+
+## Related
+
+- Agent: [`cs-ciso-iso27001`](../../agents/cs-ciso-iso27001.md)
+- Skill: [`isms-audit-expert`](SKILL.md)
+- Playbook: [iso27001_audit_playbook.md](references/iso27001_audit_playbook.md)
+- Adjacent: `../soc2-audit-prep/`, `../aims-audit/`, `../gdpr-audit-prep/`, `../compliance-readiness/`
+
+---
+
+**Version:** 1.0.0

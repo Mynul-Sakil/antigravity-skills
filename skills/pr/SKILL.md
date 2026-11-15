@@ -1,6 +1,6 @@
 ---
 name: pr
-description: "Create a GitHub PR from current branch with unpushed commits — discovers templates, analyzes changes, pushes"
+description: "Create a GitHub PR from the current branch with unpushed commits (including PRP workflow artifacts) — discovers templates, analyzes changes, and pushes."
 ---
 
 # Create Pull Request

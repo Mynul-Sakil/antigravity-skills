@@ -1,6 +1,6 @@
 ---
-name: "database-schema-designer"
-description: "Use when asked for an ERD, table relationships, normalization or a schema migration plan. Produces the ERD and normalized DDL with migration steps."
+name: database-schema-designer
+description: "Design relational/NoSQL schemas, ERDs, normalization (1NF-3NF/BCNF), indexing strategies, PostgreSQL RLS, and safe zero-downtime migrations (SQL, Prisma, Drizzle, Alembic). Includes schema_analyzer.py, index_optimizer.py, and migration_generator.py."
 ---
 
 # Database Schema Designer
@@ -246,3 +246,27 @@ npx prisma-erd-generator
 5. **Index foreign keys** — every FK column should have an index
 6. **Partial indexes** — use `WHERE deleted_at IS NULL` for active-only queries
 7. **RLS over application-level filtering** — database enforces tenancy, not just app code
+
+
+---
+
+## Bundled Python Schema, Index & Migration CLI Tools
+
+Run deterministic checks on SQL or JSON schema definitions:
+
+```bash
+# 1. Analyze schema normalization, foreign keys, naming & anti-patterns
+python3 scripts/schema_analyzer.py assets/sample_schema.sql
+
+# 2. Recommend composite/covering indexes from query workload patterns
+python3 scripts/index_optimizer.py --schema assets/sample_schema.json --queries assets/sample_query_patterns.json
+
+# 3. Generate forward + rollback DDL migrations with zero-downtime safety checks
+python3 scripts/migration_generator.py --help
+```
+
+## Additional References
+- [references/database_selection_decision_tree.md](references/database_selection_decision_tree.md) — Relational vs Document vs Key-Value vs Time-Series selection guide
+- [references/normalization_guide.md](references/normalization_guide.md) — 1NF–BCNF normalization and strategic denormalization
+- [references/index_strategy_patterns.md](references/index_strategy_patterns.md) — B-tree, GIN, GiST, partial, and covering index patterns
+- [references/database-design-reference.md](references/database-design-reference.md) — Prisma, Drizzle, Alembic, and PostgreSQL RLS reference
