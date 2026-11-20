@@ -134,6 +134,14 @@ curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main
 
 ### 6. GitHub Copilot (`--copilot`)
 
+Works natively across **VS Code Copilot Agent Mode**, **GitHub Copilot CLI**, and **GitHub Copilot Cloud Coding Agent** (`agentskills.io` `SKILL.md` standard):
+
+- **Project install (`--copilot --local`)** writes to `./.github/`:
+  - `.github/skills/<name>/SKILL.md` — selected skills + stdlib Python scripts & references
+  - `.github/instructions/<name>.instructions.md` — rules auto-converted to `applyTo` frontmatter (**never** overwrites your existing `.github/copilot-instructions.md` or `.github/workflows/`)
+  - `.github/agents/<name>.agent.md` — specialist subagents auto-converted with Copilot `tools` (`read`, `search`, `edit`, `execute`)
+- **Global install (`--copilot --global`)** writes personal skills to `~/.copilot/skills/`.
+
 **GitHub Copilot — Minimal Pack in Current Project (`./.github/{skills,instructions,agents}`):**
 
 ```bash
@@ -157,6 +165,14 @@ curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --copilot --local --role fullstack
 ```
+
+**GitHub Copilot — Update Existing Installation (Auto-Detects Local & Global):**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --copilot --update
+```
+
+> In VS Code, open Copilot Chat and run **Chat: Open Customizations** to inspect loaded skills, instructions, and custom agents. Commit `.github/{skills,instructions,agents}` if you also want **GitHub Copilot Cloud Coding Agent** on GitHub.com to use them.
 
 ---
 
@@ -221,7 +237,7 @@ Configured in `agents/*.md` using Antigravity's native schema (`subagent: true`,
 
 ## Usage Examples
 
-### 1. Run Any Skill as a Slash Command (Antigravity & Claude Code)
+### 1. Run Any Skill as a Slash Command (Antigravity, Claude Code & GitHub Copilot)
 
 | Prompt Example | What It Runs |
 | :--- | :--- |
@@ -247,6 +263,65 @@ python3 .agents/skills/financial-analyst/scripts/ratio_calculator.py .agents/ski
 
 ---
 
+## How to Add a Skill
+
+### Option A: Add an Existing Skill from This Catalog to Your Project
+
+Browse all 526 available skill names:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --list-skills
+```
+
+Add one or more skills **without replacing** your current install (works for Antigravity `--local`, Claude Code `--claude --local`, or GitHub Copilot `--copilot --local`):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --local --skill stock-analysis,seo-audit
+```
+
+### Option B: Create & Add Your Own Custom Skill
+
+Every skill is a self-contained lowercase hyphenated folder under `skills/<skill-name>/` (or `.github/skills/<skill-name>/` / `.claude/skills/<skill-name>/`):
+
+```text
+skills/my-custom-skill/
+├── SKILL.md           # Required: YAML frontmatter (name + description) + workflow steps
+├── scripts/           # Optional: stdlib-only Python 3 CLI helpers
+├── references/        # Optional: checklists, schemas, or deep guides
+└── assets/            # Optional: templates or sample inputs
+```
+
+Minimal `SKILL.md` template:
+
+```markdown
+---
+name: my-custom-skill
+description: "Use when <exact trigger condition or user request> — <concise one-line summary of what this skill produces>."
+---
+
+# My Custom Skill
+
+## When to Activate
+- Trigger 1
+- Trigger 2
+
+## Workflow
+1. Step 1
+2. Step 2
+3. Verify output before finishing
+```
+
+**Tips when contributing a skill back to this repo:**
+- Keep `name:` identical to the folder name and `SKILL.md` focused (`< 800` lines).
+- If the skill belongs in a curated pack, add its folder name to `profiles.json` under `minimal` or a `roles.<name>.skills` list.
+- Run the self-cleaning 17-suite test harness before committing:
+
+```bash
+bash tests/test_installer.sh
+```
+
+---
+
 ## Repository Layout
 
 ```text
@@ -255,6 +330,7 @@ antigravity-skills/
 ├── agents/          # 25 specialist subagents (auto-converted to .agent.md for Copilot)
 ├── rules/           # 100 rules (auto-converted to .instructions.md for Copilot)
 ├── scripts/         # Stdlib-only installer_engine.py (sparse sync & Copilot transformer)
+├── tests/           # Self-cleaning 17-suite E2E test harness (tests/test_installer.sh)
 ├── profiles.json    # Declarative catalog for 'minimal' default & 11 '--role' packs
 ├── plugin.json      # Native Antigravity plugin manifest (used for --global installs)
 ├── install.sh       # Selective sparse-checkout installer, updater & uninstaller
