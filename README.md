@@ -3,9 +3,9 @@
 [![Skills](https://img.shields.io/badge/Skills-526-10b981?style=for-the-badge)](#domain-highlights-526-skills)
 [![Subagents](https://img.shields.io/badge/Subagents-25-3b82f6?style=for-the-badge)](#25-native-subagents)
 [![Rules](https://img.shields.io/badge/Rules-100-8b5cf6?style=for-the-badge)](#how-it-works)
-[![Agents](https://img.shields.io/badge/Works_With-Antigravity_%26_Claude_Code-f59e0b?style=for-the-badge)](./INSTALLATION.md)
+[![Agents](https://img.shields.io/badge/Works_With-Antigravity_%7C_Claude_%7C_Copilot-f59e0b?style=for-the-badge)](./INSTALLATION.md)
 
-A unified, production-ready customization pack for **Antigravity** (and **Claude Code**) featuring **526 on-demand skills**, **25 specialist subagents**, and **100 context-aware engineering rules** — with **selective sparse-checkout installation** so you can install the lean **Minimal Core** (default), **a single skill**, **a role pack**, or **all 526 skills**.
+A unified, production-ready customization pack for **Antigravity**, **Claude Code**, and **GitHub Copilot** featuring **526 on-demand skills**, **25 specialist subagents**, and **100 context-aware engineering rules** — with **selective sparse-checkout installation** so you can install the lean **Minimal Core** (default), **a single skill**, **a role pack**, or **all 526 skills**.
 
 ---
 
@@ -132,7 +132,35 @@ curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main
 
 ---
 
-### 6. Update an Existing Installation
+### 6. GitHub Copilot (`--copilot`)
+
+**GitHub Copilot — Minimal Pack in Current Project (`./.github/{skills,instructions,agents}`):**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --copilot --local
+```
+
+**GitHub Copilot — Minimal Skills Globally (`~/.copilot/skills`):**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --copilot --global
+```
+
+**GitHub Copilot — Install Specific Skill Only (example: `stock-analysis`):**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --copilot --local --skill stock-analysis
+```
+
+**GitHub Copilot — Install Role Pack in Current Project (example: `fullstack`):**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --copilot --local --role fullstack
+```
+
+---
+
+### 7. Update an Existing Installation
 
 Auto-detects your local/global installation and refreshes **only** the mode, roles, and skills you installed (while preserving custom files):
 
@@ -224,12 +252,13 @@ python3 .agents/skills/financial-analyst/scripts/ratio_calculator.py .agents/ski
 ```text
 antigravity-skills/
 ├── skills/          # 526 modular skills (<name>/SKILL.md + scripts/ + references/ + assets/)
-├── agents/          # 25 native Antigravity specialist subagents
-├── rules/           # 100 rules (9 always_on core rules + 91 glob-triggered stack rules)
+├── agents/          # 25 specialist subagents (auto-converted to .agent.md for Copilot)
+├── rules/           # 100 rules (auto-converted to .instructions.md for Copilot)
+├── scripts/         # Stdlib-only installer_engine.py (sparse sync & Copilot transformer)
 ├── profiles.json    # Declarative catalog for 'minimal' default & 11 '--role' packs
 ├── plugin.json      # Native Antigravity plugin manifest (used for --global installs)
 ├── install.sh       # Selective sparse-checkout installer, updater & uninstaller
-├── INSTALLATION.md  # Complete Antigravity + Claude Code setup, modes & update guide
+├── INSTALLATION.md  # Complete Antigravity, Claude Code & GitHub Copilot setup guide
 └── README.md
 ```
 

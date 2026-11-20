@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # antigravity-skills — Selective Installer, Updater & Uninstaller
-# Modes: --minimal (default) | --skill <name> | --role <role> | --all
-# Repo:  https://github.com/Mynul-Sakil/antigravity-skills
+# Targets: Antigravity (default) | --claude | --copilot
+# Modes:   --minimal (default) | --skill <name> | --role <role> | --all
+# Repo:    https://github.com/Mynul-Sakil/antigravity-skills
 
 if [ -z "${BASH_VERSION:-}" ]; then
   echo "[ERR] Please run this script with bash (e.g., 'bash install.sh')." >&2
@@ -51,11 +52,13 @@ Usage:
 
 Target Scope Options:
   --local, --workspace    Install or update in current/project directory
-                          (Antigravity: ./.agents | Claude Code: ./.claude/skills)
+                          (Antigravity: ./.agents | Claude Code: ./.claude/skills
+                           GitHub Copilot: ./.github/{skills,instructions,agents})
   --global                Install or update globally across all projects
                           (Antigravity: ~/.gemini/config/plugins/antigravity-skills
-                           Claude Code: ~/.claude/skills)
+                           Claude Code: ~/.claude/skills | GitHub Copilot: ~/.copilot/skills)
   --claude                Target Claude Code instead of Antigravity
+  --copilot               Target GitHub Copilot instead of Antigravity
   --dir <path>            Override target project directory (implies --local if scope omitted)
 
 Install Mode Options (Default on fresh install: --minimal):
@@ -84,6 +87,8 @@ Examples:
   ./install.sh --local --skill stock-analysis       # Install ONLY 'stock-analysis' skill
   ./install.sh --global --role fullstack            # Install 'fullstack' role pack globally
   ./install.sh --claude --local --skill seo-audit   # Install 'seo-audit' in ./.claude/skills
+  ./install.sh --copilot --local                    # Install Minimal pack in ./.github/
+  ./install.sh --copilot --global                   # Install Minimal skills in ~/.copilot/skills
   ./install.sh --update                             # Update existing local/global installation
 EOF
   }
@@ -141,8 +146,9 @@ EOF
     case "$1" in
       --local|--workspace) [ "$SCOPE" = "global" ] && die "Cannot combine --local and --global." 2; SCOPE="local"; shift ;;
       --global) [ "$SCOPE" = "local" ] && die "Cannot combine --local and --global." 2; SCOPE="global"; shift ;;
-      --claude) AGENT="claude"; EXPLICIT_AGENT=1; shift ;;
-      --antigravity) AGENT="antigravity"; EXPLICIT_AGENT=1; shift ;;
+      --claude) [ "$EXPLICIT_AGENT" -eq 1 ] && [ "$AGENT" != "claude" ] && die "Cannot combine multiple agent flags." 2; AGENT="claude"; EXPLICIT_AGENT=1; shift ;;
+      --copilot|--github-copilot) [ "$EXPLICIT_AGENT" -eq 1 ] && [ "$AGENT" != "copilot" ] && die "Cannot combine multiple agent flags." 2; AGENT="copilot"; EXPLICIT_AGENT=1; shift ;;
+      --antigravity) [ "$EXPLICIT_AGENT" -eq 1 ] && [ "$AGENT" != "antigravity" ] && die "Cannot combine multiple agent flags." 2; AGENT="antigravity"; EXPLICIT_AGENT=1; shift ;;
       --dir|--project-dir) [ $# -ge 2 ] || die "Missing path argument for $1" 2; PROJECT_DIR="$2"; EXPLICIT_DIR=1; shift 2 ;;
       --minimal) [ "$EXPLICIT_BASE" = "all" ] && die "Cannot combine --minimal and --all." 2; EXPLICIT_BASE="minimal"; shift ;;
       --all) [ "$EXPLICIT_BASE" = "minimal" ] && die "Cannot combine --minimal and --all." 2; EXPLICIT_BASE="all"; shift ;;
@@ -178,10 +184,13 @@ EOF
     die "'python3' (3.8+) is required for profile resolution and safe SHA-256 manifest sync." 1
   fi
 
-  local CLONE_URL LOCAL_PROFILES_FALLBACK=""
+  local CLONE_URL LOCAL_PROFILES_FALLBACK="" LOCAL_ENGINE_FALLBACK=""
   CLONE_URL="$(normalize_repo_url "$REPO_URL")"
-  if [ -d "$REPO_URL" ] && [ -f "$REPO_URL/profiles.json" ]; then
-    LOCAL_PROFILES_FALLBACK="$(canon_dir "$REPO_URL")/profiles.json"
+  if [ -d "$REPO_URL" ]; then
+    local canon_repo=""
+    canon_repo="$(canon_dir "$REPO_URL")"
+    [ -f "$canon_repo/profiles.json" ] && LOCAL_PROFILES_FALLBACK="$canon_repo/profiles.json"
+    [ -f "$canon_repo/scripts/installer_engine.py" ] && LOCAL_ENGINE_FALLBACK="$canon_repo/scripts/installer_engine.py"
   fi
 
   stage_repo_trees() {
@@ -212,83 +221,58 @@ EOF
     fi
   }
 
-  # Unified Python engine for list, sparse-sync, and selective/full manifest uninstall
+  # Execute modular Python engine (scripts/installer_engine.py) for list & sync
   run_py_engine() {
-    "$PYTHON_BIN" - "$@" <<'PYEOF'
-import difflib, hashlib, json, os, shutil, subprocess, sys, time
+    local engine_cmd="$1" repo_dir="$2" engine_file=""
+    if [ -n "$TMP_DIR" ]; then
+      engine_file="$TMP_DIR/installer_engine.py"
+      if git -C "$repo_dir" show "HEAD:scripts/installer_engine.py" > "$engine_file" 2>/dev/null; then
+        "$PYTHON_BIN" -B "$engine_file" "$@"
+        return $?
+      fi
+    fi
+    if [ -n "$LOCAL_ENGINE_FALLBACK" ] && [ -f "$LOCAL_ENGINE_FALLBACK" ]; then
+      "$PYTHON_BIN" -B "$LOCAL_ENGINE_FALLBACK" "$@"
+      return $?
+    fi
+    die "Installer engine 'scripts/installer_engine.py' not found in repository." 1
+  }
+
+  # Inline offline-capable Python uninstaller (requires zero network access)
+  run_py_uninstall() {
+    "$PYTHON_BIN" -B - "$@" <<'PYEOF'
+import hashlib, json, os, shutil, sys
 from pathlib import Path
 
-cmd = sys.argv[1]
+dst_root, manifest_name = Path(sys.argv[1]), sys.argv[2]
+dry_run, force = (sys.argv[3] == "1"), (sys.argv[4] == "1")
+target_skills = [s.strip() for s in sys.argv[5].split(",") if s.strip()]
+manifest_path = dst_root / manifest_name
 
-def sha256(p: Path) -> str:
+def sha256_file(p: Path) -> str:
     h = hashlib.sha256()
     with p.open("rb") as f:
         for chunk in iter(lambda: f.read(65536), b""):
             h.update(chunk)
     return h.hexdigest()
 
-def load_profiles(repo_dir: str, fallback_prof: str):
-    res = subprocess.run(["git", "-C", repo_dir, "show", "HEAD:profiles.json"], capture_output=True, text=True)
-    if res.returncode == 0:
-        return json.loads(res.stdout)
-    if fallback_prof and Path(fallback_prof).is_file():
-        return json.loads(Path(fallback_prof).read_text(encoding="utf-8"))
-    return None
-
 def is_clean_rel(rel: str) -> bool:
-    if not rel or rel.startswith("/") or "\\" in rel:
-        return False
+    if not rel or rel.startswith("/") or "\\" in rel: return False
     p = Path(rel)
     return (not p.is_absolute()) and (".." not in p.parts) and ("." not in p.parts)
 
-def safe_target_path(dst_root: Path, rel: str) -> Path:
-    if not is_clean_rel(rel):
-        sys.exit(f"[ERR]  Invalid relative path in manifest: '{rel}'")
-    if dst_root.is_symlink():
-        sys.exit(f"[ERR]  Refusing to operate on symlinked root '{dst_root}'.")
-    cur = dst_root
+def safe_target_path(root: Path, rel: str) -> Path:
+    if not is_clean_rel(rel): sys.exit(f"[ERR]  Invalid relative path in manifest: '{rel}'")
+    if root.is_symlink(): sys.exit(f"[ERR]  Refusing to operate on symlinked root '{root}'.")
+    cur = root
     for part in Path(rel).parts[:-1]:
         cur = cur / part
-        if cur.is_symlink():
-            sys.exit(f"[ERR]  Refusing to traverse symlinked directory '{cur}'. Manage the target directory directly instead.")
-    p = dst_root / rel
-    dst_real = os.path.realpath(str(dst_root))
-    parent_real = os.path.realpath(str(p.parent)) if p.parent.exists() else dst_real
-    if os.path.commonpath([dst_real, parent_real]) != dst_real:
-        sys.exit(f"[ERR]  Path containment check blocked '{rel}'")
+        if cur.is_symlink(): sys.exit(f"[ERR]  Refusing to traverse symlinked directory '{cur}'.")
+    p = root / rel
+    r_real = os.path.realpath(str(root))
+    p_real = os.path.realpath(str(p.parent)) if p.parent.exists() else r_real
+    if os.path.commonpath([r_real, p_real]) != r_real: sys.exit(f"[ERR]  Path containment check blocked '{rel}'")
     return p
-
-def load_manifest(manifest_path: Path):
-    state, entries = {"base": "none", "roles": [], "skills": [], "excluded": []}, {}
-    if manifest_path.is_symlink():
-        sys.exit(f"[ERR]  Refusing to read symlinked manifest '{manifest_path}'")
-    if not manifest_path.is_file():
-        return False, state, entries
-    state = {"base": "all", "roles": [], "skills": [], "excluded": []}
-    for idx, ln in enumerate(manifest_path.read_text(encoding="utf-8").splitlines()):
-        if idx == 0 and ln.startswith("# @state "):
-            try:
-                p = json.loads(ln[len("# @state "):])
-                state = {"base": p.get("base", "minimal"), "roles": list(p.get("roles", [])),
-                         "skills": list(p.get("skills", [])), "excluded": list(p.get("excluded", []))}
-            except Exception:
-                pass
-        elif not ln.startswith("#") and "  " in ln:
-            h, rel = ln.split("  ", 1)
-            rel_s = rel.strip()
-            if not is_clean_rel(rel_s):
-                sys.exit(f"[ERR]  Corrupted or unsafe path in {manifest_path}: '{rel_s}'")
-            entries[rel_s] = h.strip()
-    return True, state, entries
-
-def save_manifest(manifest_path: Path, dst_root: Path, state: dict, entries: dict):
-    dst_root.mkdir(parents=True, exist_ok=True)
-    clean_state = {"base": state["base"], "roles": state["roles"], "skills": state["skills"]}
-    if state.get("excluded"):
-        clean_state["excluded"] = sorted(set(state["excluded"]))
-    header = "# @state " + json.dumps(clean_state, separators=(",", ":"))
-    body = [f"{h}  {r}" for r, h in sorted(entries.items())]
-    manifest_path.write_text("\n".join([header] + body) + "\n", encoding="utf-8")
 
 def prune_empty_parents(p: Path, stop_root: Path):
     parent = p.parent
@@ -301,280 +285,65 @@ def prune_empty_parents(p: Path, stop_root: Path):
         if any(parent.iterdir()): break
         parent.rmdir(); parent = parent.parent
 
-if cmd == "list":
-    repo_dir, mode, fallback_prof = sys.argv[2:5]
-    if mode == "skills":
-        out = subprocess.check_output(["git", "-C", repo_dir, "ls-tree", "-r", "--name-only", "HEAD"], text=True)
-        skills = sorted({p.split("/")[1] for p in out.splitlines() if p.startswith("skills/") and p.endswith("/SKILL.md") and p.count("/") == 2})
-        print(f"Available skills ({len(skills)}):")
-        for s in skills:
-            print(f"  {s}")
+if manifest_path.is_symlink(): sys.exit(f"[ERR]  Refusing to read symlinked manifest '{manifest_path}'")
+state, entries = {"base": "all", "roles": [], "skills": [], "excluded": []}, {}
+for idx, ln in enumerate(manifest_path.read_text(encoding="utf-8").splitlines()):
+    if idx == 0 and ln.startswith("# @state "):
+        try:
+            p = json.loads(ln[len("# @state "):])
+            state = {"base": p.get("base", "minimal"), "roles": list(p.get("roles", [])),
+                     "skills": list(p.get("skills", [])), "excluded": list(p.get("excluded", []))}
+        except Exception: pass
+    elif not ln.startswith("#") and "  " in ln:
+        h, rel = ln.split("  ", 1)
+        rel_s = rel.strip()
+        if not is_clean_rel(rel_s): sys.exit(f"[ERR]  Corrupted or unsafe path in {manifest_path}: '{rel_s}'")
+        entries[rel_s] = h.strip()
+
+if target_skills:
+    present = {r.split("/")[1] for r in entries if r.startswith("skills/") and r.count("/") >= 2}
+    missing = [s for s in target_skills if s not in present]
+    if missing: sys.stderr.write(f"[WARN] Skill(s) not installed in {dst_root}: {', '.join(missing)}\n")
+
+removed = preserved = 0
+kept = {}
+for rel, old_hash in sorted(entries.items()):
+    remove_it = (not target_skills) or any(rel.startswith(f"skills/{s}/") for s in target_skills)
+    if not remove_it:
+        kept[rel] = old_hash; continue
+    df = safe_target_path(dst_root, rel)
+    if df.is_symlink() or not df.is_file(): continue
+    if force or sha256_file(df) == old_hash:
+        removed += 1
+        if not dry_run: df.unlink(); prune_empty_parents(df, dst_root)
     else:
-        data = load_profiles(repo_dir, fallback_prof)
-        if not data:
-            sys.exit("[ERR]  profiles.json not found in repository.")
-        m = data["minimal"]
-        print(f"Default Profile:\n  {'minimal':<12} ({len(m['skills']):>2} skills, {len(m['agents']):>2} agents, {len(m['rules']):>2} rules) - {m['description']}\n")
-        print("Available --role Packs:")
-        for rname, r in data["roles"].items():
-            print(f"  {rname:<12} ({len(r['skills']):>2} skills, {len(r['agents']):>2} agents, {len(r['rules']):>2} rules) - {r['description']}")
-        if data.get("aliases"):
-            print("\nAliases: " + ", ".join(f"{k} -> {v}" for k, v in data["aliases"].items()))
+        preserved += 1
 
-elif cmd == "sync":
-    (repo_dir, dst_raw, manifest_name, agent, cur_scope,
-     explicit_base, roles_csv, skills_csv, fallback_prof, dry_s, force_s) = sys.argv[2:13]
-    dry_run, force = (dry_s == "1"), (force_s == "1")
-    src_root, dst_root = Path(repo_dir), Path(dst_raw)
-    manifest_path = dst_root / manifest_name
-
-    tree_out = subprocess.check_output(["git", "-C", repo_dir, "ls-tree", "-r", "--name-only", "HEAD"], text=True)
-    tree_files = [p for p in tree_out.splitlines() if p and "__pycache__" not in p and not p.endswith((".pyc", ".DS_Store"))]
-    all_skills = sorted({p.split("/")[1] for p in tree_files if p.startswith("skills/") and p.endswith("/SKILL.md") and p.count("/") == 2})
-    all_skill_set = set(all_skills)
-    prof_data = load_profiles(repo_dir, fallback_prof)
-
-    cli_roles = [r.strip() for r in roles_csv.split(",") if r.strip()]
-    cli_skills = [s.strip() for s in skills_csv.split(",") if s.strip()]
-
-    if cli_roles:
-        if not prof_data:
-            sys.exit("[ERR]  profiles.json not found in repository.")
-        aliases, valid_roles = prof_data.get("aliases", {}), prof_data.get("roles", {})
-        resolved = []
-        for r in cli_roles:
-            tr = aliases.get(r, r)
-            if tr not in valid_roles:
-                sys.stderr.write(f"[ERR]  Unknown role '{r}'. Available roles: {', '.join(valid_roles)}\n")
-                sys.exit(2)
-            resolved.append(tr)
-        cli_roles = resolved
-
-    for s in cli_skills:
-        if s not in all_skill_set:
-            close = difflib.get_close_matches(s, all_skills, n=5, cutoff=0.45)
-            subs = [k for k in all_skills if s.lower() in k.lower() and k not in close][:3]
-            hints = (close + subs)[:5]
-            msg = f" Did you mean: {', '.join(hints)}?" if hints else " Run with --list-skills to browse."
-            sys.stderr.write(f"[ERR]  Skill '{s}' not found.{msg}\n")
-            sys.exit(2)
-
-    has_existing, old_state, old_manifest = load_manifest(manifest_path)
-    old_excl = set(old_state.get("excluded", [])) - set(cli_skills)
-    if explicit_base == "all":
-        new_state, sync_mode = {"base": "all", "roles": [], "skills": [], "excluded": []}, "RECONCILE"
-    elif explicit_base == "minimal":
-        new_state, sync_mode = {"base": "minimal", "roles": sorted(set(cli_roles)), "skills": sorted(set(cli_skills)), "excluded": []}, "RECONCILE"
-    elif cli_roles or cli_skills:
-        sync_mode = "ADDITIVE"
-        if old_state["base"] == "all":
-            new_state = {"base": "all", "roles": [], "skills": [], "excluded": sorted(old_excl)}
-        else:
-            new_state = {"base": old_state["base"], "roles": sorted(set(old_state["roles"]) | set(cli_roles)),
-                         "skills": sorted(set(old_state["skills"]) | set(cli_skills)), "excluded": sorted(old_excl)}
-    else:
-        sync_mode = "RECONCILE"
-        new_state = old_state if has_existing else {"base": "minimal", "roles": [], "skills": [], "excluded": []}
-
-    if (new_state["base"] == "minimal" or new_state["roles"]) and not prof_data:
-        sys.exit("[ERR]  profiles.json is required to resolve minimal/role bundles.")
-
-    excl_set = set(new_state.get("excluded", []))
-    def collect(st):
-        if st["base"] == "all":
-            if excl_set:
-                return sorted(all_skill_set - excl_set), "ALL", "ALL"
-            return None, None, None
-        sk, ag, rl = set(st["skills"]), set(), set()
-        if st["base"] == "minimal":
-            m = prof_data["minimal"]
-            sk.update(m["skills"]); ag.update(m["agents"]); rl.update(m["rules"])
-        for r in st["roles"]:
-            rb = prof_data["roles"][r]
-            sk.update(rb["skills"]); ag.update(rb["agents"]); rl.update(rb["rules"])
-        sk -= excl_set
-        return sorted(sk), sorted(ag), sorted(rl)
-
-    f_state = {"base": "none", "roles": sorted(set(cli_roles)), "skills": sorted(set(cli_skills)), "excluded": []} if sync_mode == "ADDITIVE" else new_state
-    f_sk, f_ag, f_rl = collect(f_state)
-
-    patterns, synced_prefixes, wanted_set = [], [], set()
-    if agent == "antigravity" and cur_scope == "global" and "plugin.json" in tree_files:
-        patterns.append("/plugin.json"); synced_prefixes.append("plugin.json"); wanted_set.add("plugin.json")
-
-    if f_sk is None:
-        patterns.append("/skills/"); synced_prefixes.append("skills/")
-        if agent == "antigravity":
-            patterns.extend(["/agents/", "/rules/"]); synced_prefixes.extend(["agents/", "rules/"])
-        for tf in tree_files:
-            if tf.startswith("skills/") or (agent == "antigravity" and tf.startswith(("agents/", "rules/"))):
-                wanted_set.add(tf)
-    else:
-        sk_pfx = tuple(f"skills/{s}/" for s in f_sk)
-        for s in f_sk:
-            patterns.append(f"/skills/{s}/"); synced_prefixes.append(f"skills/{s}/")
-        for tf in tree_files:
-            if sk_pfx and tf.startswith(sk_pfx):
-                wanted_set.add(tf)
-        if agent == "antigravity":
-            if f_ag == "ALL":
-                patterns.extend(["/agents/", "/rules/"]); synced_prefixes.extend(["agents/", "rules/"])
-                wanted_set.update(tf for tf in tree_files if tf.startswith(("agents/", "rules/")))
-            else:
-                for a in f_ag:
-                    ra = f"agents/{a}"
-                    if ra in tree_files:
-                        patterns.append(f"/{ra}"); synced_prefixes.append(ra); wanted_set.add(ra)
-                for r in f_rl:
-                    rr = f"rules/{r}"
-                    if rr in tree_files:
-                        patterns.append(f"/{rr}"); synced_prefixes.append(rr); wanted_set.add(rr)
-
-    parts = []
-    if sync_mode == "ADDITIVE":
-        if cli_roles: parts.append("role=" + ",".join(cli_roles))
-        if cli_skills: parts.append("skill=" + ",".join(cli_skills))
-        label = "additive (" + " + ".join(parts) + ")"
-    else:
-        if new_state["base"] != "none": parts.append(new_state["base"])
-        if new_state["roles"]: parts.append("role=" + ",".join(new_state["roles"]))
-        if new_state["skills"]: parts.append("skill=" + ",".join(new_state["skills"]))
-        label = " + ".join(parts) if parts else "custom"
-    print(f"[INFO] Syncing {agent} ({cur_scope}) [mode: {label}] -> {dst_root}")
-
-    if patterns:
-        git_env = {**os.environ, "GIT_TERMINAL_PROMPT": "0"}
-        if f_sk is None:
-            is_prom = subprocess.run(["git", "-C", repo_dir, "config", "--bool", "remote.origin.promisor"],
-                                     capture_output=True, text=True).stdout.strip() == "true"
-            if is_prom and subprocess.run(["git", "-C", repo_dir, "fetch", "--quiet", "--refetch", "origin", "HEAD"], check=False, env=git_env, capture_output=True).returncode == 0:
-                subprocess.run(["git", "-C", repo_dir, "config", "--unset", "remote.origin.promisor"], check=False)
-                subprocess.run(["git", "-C", repo_dir, "config", "--unset", "remote.origin.partialclonefilter"], check=False)
-        has_sparse = subprocess.run(["git", "-C", repo_dir, "sparse-checkout", "-h"], capture_output=True).returncode == 0
-        if has_sparse:
-            subprocess.run(["git", "-C", repo_dir, "sparse-checkout", "init", "--no-cone"], check=True, env=git_env, capture_output=True)
-            subprocess.run(["git", "-C", repo_dir, "sparse-checkout", "set", "--no-cone", "--stdin"],
-                           input="\n".join(patterns) + "\n", text=True, check=True, env=git_env, capture_output=True)
-            subprocess.run(["git", "-C", repo_dir, "checkout", "--quiet", "-f", "HEAD"], check=True, env=git_env, capture_output=True)
-        else:
-            clean_p = [p.lstrip("/").rstrip("/") for p in patterns]
-            subprocess.run(["git", "-C", repo_dir, "checkout", "--quiet", "HEAD", "--", *clean_p], check=True, env=git_env, capture_output=True)
-
-    backup_root = dst_root / ".backups" / time.strftime("%Y%m%d-%H%M%S")
-    added = updated = unchanged = preserved = pruned = 0
-    new_manifest = {}
-
-    for rel in sorted(wanted_set):
-        sf = src_root / rel
-        if sf.is_symlink() or not sf.is_file():
-            sys.exit(f"[ERR]  Expected sparse-checkout file missing or symlinked: {rel}")
-        s_hash = sha256(sf)
-        df = safe_target_path(dst_root, rel)
-        if df.is_symlink():
-            preserved += 1
-            continue
-        if not df.exists():
-            added += 1; new_manifest[rel] = s_hash
-            if not dry_run:
-                df.parent.mkdir(parents=True, exist_ok=True); shutil.copy2(sf, df)
-        else:
-            d_hash = sha256(df)
-            if d_hash == s_hash:
-                unchanged += 1; new_manifest[rel] = s_hash
-            elif rel in old_manifest and old_manifest[rel] == d_hash:
-                updated += 1; new_manifest[rel] = s_hash
-                if not dry_run: shutil.copy2(sf, df)
-            elif force:
-                updated += 1; new_manifest[rel] = s_hash
-                if not dry_run:
-                    bf = backup_root / rel
-                    bf.parent.mkdir(parents=True, exist_ok=True)
-                    shutil.copy2(df, bf); shutil.copy2(sf, df)
-            else:
-                preserved += 1
-                if rel in old_manifest: new_manifest[rel] = old_manifest[rel]
-
-    for rel, old_hash in sorted(old_manifest.items()):
-        if rel in wanted_set:
-            continue
-        in_scope = (sync_mode == "RECONCILE") or any(
-            (rel.startswith(p) if p.endswith("/") else rel == p) for p in synced_prefixes
-        )
-        df = safe_target_path(dst_root, rel)
-        if not in_scope:
-            if not df.is_symlink() and df.is_file():
-                new_manifest[rel] = old_hash
-            continue
-        if not df.is_symlink() and df.is_file():
-            if sha256(df) == old_hash:
-                pruned += 1
-                if not dry_run:
-                    df.unlink(); prune_empty_parents(df, dst_root)
-            else:
-                preserved += 1
-
-    if not dry_run:
-        save_manifest(manifest_path, dst_root, new_state, new_manifest)
-    sk_cnt = len({r.split("/")[1] for r in new_manifest if r.startswith("skills/") and r.count("/") >= 2})
-    pfx = "[DRY-RUN] " if dry_run else ""
-    print(f"{pfx}Sync summary -> active skills: {sk_cnt} | added: {added}, updated: {updated}, unchanged: {unchanged}, preserved custom: {preserved}, pruned: {pruned}")
-
-elif cmd == "uninstall":
-    dst_root, manifest_name = Path(sys.argv[2]), sys.argv[3]
-    dry_run, force = (sys.argv[4] == "1"), (sys.argv[5] == "1")
-    target_skills = [s.strip() for s in sys.argv[6].split(",") if s.strip()]
-    manifest_path = dst_root / manifest_name
-    _, state, entries = load_manifest(manifest_path)
-
-    if target_skills:
-        present = {r.split("/")[1] for r in entries if r.startswith("skills/") and r.count("/") >= 2}
-        missing = [s for s in target_skills if s not in present]
-        if missing:
-            sys.stderr.write(f"[WARN] Skill(s) not installed in {dst_root}: {', '.join(missing)}\n")
-
-    removed = preserved = 0
-    kept = {}
-    for rel, old_hash in sorted(entries.items()):
-        remove_it = (not target_skills) or any(rel.startswith(f"skills/{s}/") for s in target_skills)
-        if not remove_it:
-            kept[rel] = old_hash
-            continue
-        df = safe_target_path(dst_root, rel)
-        if df.is_symlink() or not df.is_file():
-            continue
-        if force or sha256(df) == old_hash:
+if target_skills:
+    explicit_sk, excl = set(state.get("skills", [])), set(state.get("excluded", []))
+    for s in target_skills:
+        if s in explicit_sk: explicit_sk.discard(s)
+        elif state.get("base") != "none" or state.get("roles"): excl.add(s)
+    state["skills"], state["excluded"] = sorted(explicit_sk), sorted(excl)
+    if not [r for r in kept if r != "plugin.json"] and "plugin.json" in kept:
+        pf = safe_target_path(dst_root, "plugin.json")
+        if not pf.is_symlink() and pf.is_file() and (force or sha256_file(pf) == kept["plugin.json"]):
             removed += 1
-            if not dry_run:
-                df.unlink(); prune_empty_parents(df, dst_root)
-        else:
-            preserved += 1
+            if not dry_run: pf.unlink()
+        kept.pop("plugin.json", None)
 
-    if target_skills:
-        explicit_sk = set(state.get("skills", []))
-        excl = set(state.get("excluded", []))
-        for s in target_skills:
-            if s in explicit_sk:
-                explicit_sk.discard(s)
-            elif state.get("base") != "none" or state.get("roles"):
-                excl.add(s)
-        state["skills"] = sorted(explicit_sk)
-        state["excluded"] = sorted(excl)
-        if not [r for r in kept if r != "plugin.json"] and "plugin.json" in kept:
-            pf = safe_target_path(dst_root, "plugin.json")
-            if not pf.is_symlink() and pf.is_file() and (force or sha256(pf) == kept["plugin.json"]):
-                removed += 1
-                if not dry_run: pf.unlink()
-            kept.pop("plugin.json", None)
-
-    if not dry_run:
-        if kept:
-            save_manifest(manifest_path, dst_root, state, kept)
-        else:
-            manifest_path.unlink()
-            if dst_root.exists() and not dst_root.is_symlink() and not any(dst_root.iterdir()):
-                dst_root.rmdir()
-    pfx = "[DRY-RUN] " if dry_run else ""
-    print(f"{pfx}Uninstall summary -> removed managed files: {removed}, preserved modified/custom files: {preserved}")
+if not dry_run:
+    if kept:
+        clean_state = {"base": state["base"], "roles": state["roles"], "skills": state["skills"]}
+        if state.get("excluded"): clean_state["excluded"] = sorted(set(state["excluded"]))
+        header = "# @state " + json.dumps(clean_state, separators=(",", ":"))
+        manifest_path.write_text("\n".join([header] + [f"{h}  {r}" for r, h in sorted(kept.items())]) + "\n", encoding="utf-8")
+    else:
+        manifest_path.unlink()
+        if dst_root.exists() and not dst_root.is_symlink() and not any(dst_root.iterdir()):
+            dst_root.rmdir()
+pfx = "[DRY-RUN] " if dry_run else ""
+print(f"{pfx}Uninstall summary -> removed managed files: {removed}, preserved modified/custom files: {preserved}")
 PYEOF
   }
 
@@ -602,6 +371,9 @@ PYEOF
       if [ "$(basename -- "$PROJECT_DIR")" = ".agents" ] && is_our_repo_clone "$PROJECT_DIR"; then has_local=1
       elif is_our_repo_clone "$PROJECT_DIR/.agents" || [ -f "$PROJECT_DIR/.agents/$MANIFEST_NAME" ]; then has_local=1; fi
       if is_our_repo_clone "${HOME}/.gemini/config/plugins/antigravity-skills" || [ -f "${HOME}/.gemini/config/plugins/antigravity-skills/$MANIFEST_NAME" ]; then has_global=1; fi
+    elif [ "$AGENT" = "copilot" ]; then
+      [ -f "$PROJECT_DIR/.github/$MANIFEST_NAME" ] && has_local=1
+      [ -f "${HOME}/.copilot/$MANIFEST_NAME" ] && has_global=1
     else
       [ -f "$PROJECT_DIR/.claude/$MANIFEST_NAME" ] && has_local=1
       [ -f "${HOME}/.claude/$MANIFEST_NAME" ] && has_global=1
@@ -616,12 +388,15 @@ PYEOF
     has_tty || die "Non-interactive session detected without a scope flag. Pass --local or --global (e.g., curl -fsSL .../install.sh | bash -s -- --local)." 2
     local def_target="1"
     [ "$EXPLICIT_AGENT" -eq 1 ] && [ "$AGENT" = "claude" ] && def_target="3"
+    [ "$EXPLICIT_AGENT" -eq 1 ] && [ "$AGENT" = "copilot" ] && def_target="5"
     printf "\n%bAntigravity Skills — Step 1/2: Choose Target Location%b\n" "$C_BOLD" "$C_RESET" >/dev/tty
-    printf "  1) Antigravity — Current Directory (%s/.agents)\n" "$PROJECT_DIR" >/dev/tty
-    printf "  2) Antigravity — Global Plugin     (%s/.gemini/config/plugins/antigravity-skills)\n" "$HOME" >/dev/tty
-    printf "  3) Claude Code — Current Directory (%s/.claude/skills)\n" "$PROJECT_DIR" >/dev/tty
-    printf "  4) Claude Code — Global            (%s/.claude/skills)\n" "$HOME" >/dev/tty
-    printf "\nSelect target [1-4] (default: %s): " "$def_target" >/dev/tty
+    printf "  1) Antigravity    — Current Directory (%s/.agents)\n" "$PROJECT_DIR" >/dev/tty
+    printf "  2) Antigravity    — Global Plugin     (%s/.gemini/config/plugins/antigravity-skills)\n" "$HOME" >/dev/tty
+    printf "  3) Claude Code    — Current Directory (%s/.claude/skills)\n" "$PROJECT_DIR" >/dev/tty
+    printf "  4) Claude Code    — Global            (%s/.claude/skills)\n" "$HOME" >/dev/tty
+    printf "  5) GitHub Copilot — Current Directory (%s/.github)\n" "$PROJECT_DIR" >/dev/tty
+    printf "  6) GitHub Copilot — Global            (%s/.copilot/skills)\n" "$HOME" >/dev/tty
+    printf "\nSelect target [1-6] (default: %s): " "$def_target" >/dev/tty
     local choice=""
     read -r choice </dev/tty || true
     case "${choice:-$def_target}" in
@@ -629,6 +404,8 @@ PYEOF
       2) AGENT="antigravity"; SCOPE="global" ;;
       3) AGENT="claude";      SCOPE="local" ;;
       4) AGENT="claude";      SCOPE="global" ;;
+      5) AGENT="copilot";     SCOPE="local" ;;
+      6) AGENT="copilot";     SCOPE="global" ;;
       *) die "Invalid selection: $choice" 2 ;;
     esac
 
@@ -682,7 +459,7 @@ PYEOF
         prompt_confirm "Remove antigravity-skills managed files from $target_root (custom files will be preserved)?" || { warn "Uninstall cancelled."; return 0; }
       fi
     fi
-    run_py_engine "uninstall" "$target_root" "$MANIFEST_NAME" "$DRY_RUN" "$FORCE" "$skills_only_csv"
+    run_py_uninstall "$target_root" "$MANIFEST_NAME" "$DRY_RUN" "$FORCE" "$skills_only_csv"
   }
 
   git_update_clone() {
@@ -763,6 +540,12 @@ PYEOF
         git_update_clone "$target_dir"
         return 0
       fi
+    elif [ "$AGENT" = "copilot" ]; then
+      if [ "$cur_scope" = "local" ]; then target_dir="${PROJECT_DIR}/.github"; else target_dir="${HOME}/.copilot"; fi
+      if [ "$ACTION" = "uninstall" ]; then
+        [ -f "$target_dir/$MANIFEST_NAME" ] || { warn "No managed GitHub Copilot installation manifest found at $target_dir."; return 0; }
+        uninstall_manifest_target "$target_dir" "$REQ_SKILLS_CSV"; return 0
+      fi
     else
       if [ "$cur_scope" = "local" ]; then target_dir="${PROJECT_DIR}/.claude"; else target_dir="${HOME}/.claude"; fi
       if [ "$ACTION" = "uninstall" ]; then
@@ -785,6 +568,14 @@ PYEOF
         info "Note: Global plugin (~/.gemini/config/plugins/antigravity-skills) is also installed; workspace ./.agents takes precedence here."
       [ "$cur_scope" = "global" ] && [ -d "${PROJECT_DIR}/.agents/skills" ] && [ "$PROJECT_DIR" != "$target_dir" ] && \
         info "Note: Current directory also has ./.agents/skills, which overrides global skills inside $PROJECT_DIR."
+    elif [ "$AGENT" = "copilot" ]; then
+      if [ "$cur_scope" = "local" ]; then
+        ok "GitHub Copilot customization ready in $target_dir/{skills,instructions,agents}"
+        [ "$DRY_RUN" -eq 0 ] && [ -d "${PROJECT_DIR}/.git" ] && \
+          info "Tip: Commit .github/{skills,instructions,agents} to enable GitHub Copilot Cloud Coding Agent on GitHub.com (you may add .github/.antigravity-skills.manifest to .gitignore)."
+      else
+        ok "GitHub Copilot personal skills ready in $target_dir/skills"
+      fi
     else
       ok "Claude Code skills ready in $target_dir/skills"
     fi

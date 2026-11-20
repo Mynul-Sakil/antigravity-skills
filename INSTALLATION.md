@@ -1,6 +1,6 @@
 # Installation & Update Guide
 
-Complete guide for installing, updating, customizing, and uninstalling **`antigravity-skills`** in **Antigravity** and **Claude Code** — either in your **current project directory** (`--local`) or **globally** (`--global`), using **`minimal`** (default), **specific `--skill`**, **`--role` packs**, or **`--all`**.
+Complete guide for installing, updating, customizing, and uninstalling **`antigravity-skills`** in **Antigravity**, **Claude Code**, and **GitHub Copilot** — either in your **current project directory** (`--local`) or **globally** (`--global`), using **`minimal`** (default), **specific `--skill`**, **`--role` packs**, or **`--all`**.
 
 > **One-Click Copy-Paste Ready:** Every code block in this guide contains a **single standalone command** so clicking GitHub's Copy button always copies one ready-to-run command.
 
@@ -15,12 +15,13 @@ Complete guide for installing, updating, customizing, and uninstalling **`antigr
 5. [Installing Specific Skills Without Downloading the Whole Repo (`--skill`)](#5-installing-specific-skills-without-downloading-the-whole-repo---skill)
 6. [Installing Role Packs (`--role`)](#6-installing-role-packs---role)
 7. [Claude Code Installation Guide (`--claude`)](#7-claude-code-installation-guide---claude)
-8. [Using Both Antigravity & Claude Code in One Repo](#8-using-both-antigravity--claude-code-in-one-repo)
-9. [Updating an Existing Installation (`--update`)](#9-updating-an-existing-installation---update)
-10. [Selective Skill Filtering via `skills.json`](#10-selective-skill-filtering-via-skillsjson)
-11. [OS-Specific Notes (macOS, Linux, Windows)](#11-os-specific-notes-macos-linux-windows)
-12. [Verification & Troubleshooting](#12-verification--troubleshooting)
-13. [Uninstallation](#13-uninstallation)
+8. [GitHub Copilot Installation Guide (`--copilot`)](#8-github-copilot-installation-guide---copilot)
+9. [Using Multiple Agents in One Repo](#9-using-multiple-agents-in-one-repo)
+10. [Updating an Existing Installation (`--update`)](#10-updating-an-existing-installation---update)
+11. [Selective Skill Filtering via `skills.json`](#11-selective-skill-filtering-via-skillsjson)
+12. [OS-Specific Notes (macOS, Linux, Windows)](#12-os-specific-notes-macos-linux-windows)
+13. [Verification & Troubleshooting](#13-verification--troubleshooting)
+14. [Uninstallation](#14-uninstallation)
 
 ---
 
@@ -39,6 +40,7 @@ Complete guide for installing, updating, customizing, and uninstalling **`antigr
 | :--- | :--- | :--- |
 | **Antigravity Path** | `<your-project>/.agents/` | `~/.gemini/config/plugins/antigravity-skills/` |
 | **Claude Code Path** | `<your-project>/.claude/skills/` | `~/.claude/skills/` |
+| **GitHub Copilot Path** | `<your-project>/.github/{skills,instructions,agents}/` | `~/.copilot/skills/` |
 | **Active Scope** | Only when working inside `<your-project>` | Available in **every** project on your machine |
 | **Personal Config Safety** | Self-contained inside the project folder | Isolated as a plugin (Antigravity) or SHA-256 manifest-tracked (Claude Code) — never overwrites your personal skills |
 | **Settings UI Toggle** | Managed per workspace / `skills.json` | One-click **Enable / Disable** in Antigravity Plugins UI |
@@ -245,7 +247,52 @@ curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main
 
 ---
 
-## 8. Using Both Antigravity & Claude Code in One Repo
+## 8. GitHub Copilot Installation Guide (`--copilot`)
+
+All **526 skills** follow the open `agentskills.io` `SKILL.md` standard natively supported by **VS Code Copilot Agent Mode**, **GitHub Copilot CLI**, and **GitHub Copilot Cloud Coding Agent**.
+
+- **`--copilot --local`** installs into `./.github/`:
+  - `skills/<name>/SKILL.md` *(copied verbatim with `scripts/`, `references/`, `assets/`)*
+  - `instructions/<name>.instructions.md` *(rules auto-converted to `applyTo` frontmatter — never touches your existing `.github/copilot-instructions.md` or `.github/workflows/`)*
+  - `agents/<name>.agent.md` *(subagents auto-converted with mapped Copilot `tools`)*
+- **`--copilot --global`** installs personal skills into `~/.copilot/skills/`.
+
+### GitHub Copilot — Minimal Pack *(Default: 17 Core Skills, 8 Instructions, 8 Agents)* in Current Project (`./.github`)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --copilot --local
+```
+
+### GitHub Copilot — Minimal Skills *(Default: 17 Core Skills)* Globally (`~/.copilot/skills`)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --copilot --global
+```
+
+### GitHub Copilot — Install Specific Skill(s) Only
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --copilot --local --skill stock-analysis,financial-analyst
+```
+
+### GitHub Copilot — Install a Role Pack in Current Project (Example: `fullstack`)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --copilot --local --role fullstack
+```
+
+### GitHub Copilot — Install All 526 Skills Locally
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --copilot --local --all
+```
+
+> [!TIP]
+> **Copilot Context Tip:** Stick to `--minimal`, `--role`, or `--skill` in Copilot so discovery metadata stays lean. Commit `.github/{skills,instructions,agents}` to your repo if you want **GitHub Copilot Cloud Coding Agent** on GitHub.com to use them automatically.
+
+---
+
+## 9. Using Multiple Agents in One Repo
 
 If your team uses both agents in the same repository, install once into `./.agents` and symlink `./.claude/skills` so both agents share one copy:
 
@@ -263,7 +310,7 @@ mkdir -p .claude && ln -s ../.agents/skills .claude/skills
 
 ---
 
-## 9. Updating an Existing Installation (`--update`)
+## 10. Updating an Existing Installation (`--update`)
 
 `install.sh` stores your active mode, roles, and added skills in `.antigravity-skills.manifest` (`# @state {...}`). When you run `--update`, it refreshes **only** what you installed — it will never unexpectedly bloat a `minimal` or `--skill` install into all 526 skills, and it never overwrites custom or locally edited files.
 
@@ -291,9 +338,15 @@ curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main
 curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --claude --global --update
 ```
 
+### Update GitHub Copilot Installation (Auto-Detects Local & Global)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --copilot --update
+```
+
 ---
 
-## 10. Selective Skill Filtering via `skills.json`
+## 11. Selective Skill Filtering via `skills.json`
 
 If you installed `--all` globally (`~/.gemini/config/plugins/antigravity-skills`), you can also filter which skills auto-load in a specific Antigravity project by creating `.agents/skills.json`:
 
@@ -319,7 +372,7 @@ If you installed `--all` globally (`~/.gemini/config/plugins/antigravity-skills`
 
 ---
 
-## 11. OS-Specific Notes (macOS, Linux, Windows)
+## 12. OS-Specific Notes (macOS, Linux, Windows)
 
 ### macOS
 Works out of the box with macOS's built-in `/bin/bash` (Bash 3.2) and `python3`. If `git` prompts for developer tools, run:
@@ -344,7 +397,7 @@ git config --global core.autocrlf input
 
 ---
 
-## 12. Verification & Troubleshooting
+## 13. Verification & Troubleshooting
 
 ### Check Installed Skill Count in Current Project
 
@@ -371,7 +424,7 @@ python3 .agents/skills/financial-analyst/scripts/ratio_calculator.py .agents/ski
 
 ---
 
-## 13. Uninstallation
+## 14. Uninstallation
 
 Uninstallation verifies repository/manifest hashes so your custom or modified files are never deleted unless `--force` is passed.
 
@@ -397,6 +450,18 @@ curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --claude --global --uninstall
+```
+
+### Uninstall GitHub Copilot Managed Files (Current Project — Preserves `.github/workflows/` & `copilot-instructions.md`)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --copilot --local --uninstall
+```
+
+### Uninstall GitHub Copilot Managed Skills (Global)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --copilot --global --uninstall
 ```
 
 *(Append `--yes` in non-interactive scripts to skip the `[y/N]` confirmation prompt, or `--dry-run` to preview.)*
