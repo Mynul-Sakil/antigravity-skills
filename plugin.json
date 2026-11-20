@@ -2,7 +2,7 @@
   "name": "antigravity-skills",
   "displayName": "Antigravity Skills, Agents & Rules",
   "version": "1.0.0",
-  "description": "526 on-demand skills, 25 specialist subagents, and 100 context-aware rules for Antigravity and Claude Code.",
+  "description": "531 on-demand skills, 25 specialist subagents, and 100 context-aware rules for Antigravity, Claude Code, and GitHub Copilot.",
   "author": "Mynul-Sakil",
   "repository": "https://github.com/Mynul-Sakil/antigravity-skills"
 }

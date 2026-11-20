@@ -1,11 +1,11 @@
 # Antigravity Skills, Subagents & Rules
 
-[![Skills](https://img.shields.io/badge/Skills-526-10b981?style=for-the-badge)](#domain-highlights-526-skills)
+[![Skills](https://img.shields.io/badge/Skills-531-10b981?style=for-the-badge)](#domain-highlights-531-skills)
 [![Subagents](https://img.shields.io/badge/Subagents-25-3b82f6?style=for-the-badge)](#25-native-subagents)
 [![Rules](https://img.shields.io/badge/Rules-100-8b5cf6?style=for-the-badge)](#how-it-works)
 [![Agents](https://img.shields.io/badge/Works_With-Antigravity_%7C_Claude_%7C_Copilot-f59e0b?style=for-the-badge)](./INSTALLATION.md)
 
-A unified, production-ready customization pack for **Antigravity**, **Claude Code**, and **GitHub Copilot** featuring **526 on-demand skills**, **25 specialist subagents**, and **100 context-aware engineering rules** — with **selective sparse-checkout installation** so you can install the lean **Minimal Core** (default), **a single skill**, **a role pack**, or **all 526 skills**.
+A unified, production-ready customization pack for **Antigravity**, **Claude Code**, and **GitHub Copilot** featuring **531 on-demand skills**, **25 specialist subagents**, and **100 context-aware engineering rules** — with **selective sparse-checkout installation** so you can install the lean **Minimal Core** (default), **a single skill**, **a role pack**, or **all 531 skills**.
 
 ---
 
@@ -16,7 +16,7 @@ A unified, production-ready customization pack for **Antigravity**, **Claude Cod
 | **Minimal *(Default)*** | *(none)* or `--minimal` | **17** daily core skills, **8** core subagents, **8** core rules | **No** (sparse fetch) |
 | **Specific Skill(s)** | `--skill <name>` | **Only** the requested skill folder(s) (`SKILL.md` + `scripts/` + `references/`) | **No** (sparse fetch) |
 | **Role Pack** | `--role <role>` | Curated pack (`frontend`, `backend`, `fullstack`, `qa`, `security`, `devops`, `ai-ml`, `finance`, `product`, `marketing`, `founder`) | **No** (sparse fetch) |
-| **Full Catalog** | `--all` | All **526** skills, **25** subagents, and **100** rules | Yes |
+| **Full Catalog** | `--all` | All **531** skills, **25** subagents, and **100** rules | Yes |
 
 ---
 
@@ -88,7 +88,7 @@ curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main
 
 ---
 
-### 4. Antigravity — Full Catalog (`--all`: All 526 Skills, 25 Subagents, 100 Rules)
+### 4. Antigravity — Full Catalog (`--all`: All 531 Skills, 25 Subagents, 100 Rules)
 
 **Current Project Directory (`./.agents`):**
 
@@ -124,7 +124,7 @@ curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main
 curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --claude --local --skill stock-analysis
 ```
 
-**Claude Code — Install All 526 Skills Globally:**
+**Claude Code — Install All 531 Skills Globally:**
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --claude --global --all
@@ -194,14 +194,14 @@ This repository is built natively around **Progressive Disclosure** so you get d
 
 | Component | Folder | Total Available | How It Loads | Context Cost |
 | :--- | :--- | :---: | :--- | :--- |
-| **Skills & Slash Workflows** | `skills/<name>/SKILL.md` | **526** | Type `/<name>` in chat **or** ask in plain English | Full `SKILL.md`, `references/`, and `scripts/` load **only when activated** |
+| **Skills & Slash Workflows** | `skills/<name>/SKILL.md` | **531** | Type `/<name>` in chat **or** ask in plain English | Full `SKILL.md`, `references/`, and `scripts/` load **only when activated** |
 | **Specialist Subagents** | `agents/<name>.md` | **25** | Delegated via `invoke_subagent` (`subagent: true`) | Runs in an **isolated subagent context**; sized to keep built-in `browser` & `research` active |
 | **Core Engineering Rules** | `rules/common-*.md` | **8** (+1 optional) | `trigger: always_on` | Compact baseline (immutability, TDD, security, code review, git workflow) |
 | **Language & Stack Rules** | `rules/<stack>-*.md` | **91** | `trigger: glob` (e.g. `**/*.ts`, `**/*.py`) | **Zero tokens** until you open or edit matching files |
 
 ---
 
-## Domain Highlights (526 Skills)
+## Domain Highlights (531 Skills)
 
 Every skill includes structured workflows, reference checklists, and (where applicable) **zero-dependency Python 3 CLI tools** (`scripts/*.py`, stdlib-only). All skills work as `/<skill-name>` slash commands:
 
@@ -213,12 +213,12 @@ Every skill includes structured workflows, reference checklists, and (where appl
 | **Multi-Agent Orchestration** | `/orch-workflow`, `/gan-build`, `/gan-design`, `/santa-method`, `/council`, `/hub-run` |
 | **Git, PR & DevOps** | `/pr`, `/code-review`, `/git-sync`, `/deploy-verify`, `/runbook-generator`, `/pm2`, `/quality-gate` |
 | **Security & AI Safety** | `/senior-security`, `/ai-security`, `/red-team`, `/threat-detection`, `/soc2-compliance`, `/gdpr-dsgvo-expert`, `/eu-ai-act-specialist` |
-| **Stock, Finance & Valuation** | `/stock-analysis`, `/financial-analyst`, `/passive-deal-screener`, `/business-investment-advisor`, `/cfo-advisor` |
+| **Stock, Finance & Valuation** | `/stock-analysis`, `/dse-stock-analyst`, `/financial-analyst`, `/passive-deal-screener`, `/business-investment-advisor`, `/cfo-advisor` |
 | **Deep Research & Intel** | `/deep-research`, `/exa-search`, `/pulse`, `/competitive-intel`, `/graphify` |
 | **Product & Agile Delivery** | `/agile-product-owner`, `/product-discovery`, `/product-strategist`, `/product-analytics`, `/experiment-designer`, `/jira-expert` |
 | **C-Suite & Strategy** | `/boardroom`, `/ceo-advisor`, `/cto-review`, `/cpo-review`, `/challenge`, `/stress-test`, `/hard-call`, `/scenario-war-room` |
 | **Marketing, SEO & CRO** | `/seo-audit`, `/page-cro`, `/signup-flow-cro`, `/form-cro`, `/pricing-strategy`, `/launch-strategy`, `/social-content` |
-| **Daily Productivity** | `/today-summary`, `/weekly-presentation-organizer`, `/rewrite`, `/prompt-engineer`, `/sessions`, `/session-handoff` |
+| **Daily Productivity** | `/today-summary`, `/weekly-presentation-organizer`, `/rewrite`, `/prompt-engineer`, `/coding-prompt-spec`, `/book-mentor`, `/mock-tech-interview`, `/job-application-email`, `/sessions`, `/session-handoff` |
 
 ---
 
@@ -267,7 +267,7 @@ python3 .agents/skills/financial-analyst/scripts/ratio_calculator.py .agents/ski
 
 ### Option A: Add an Existing Skill from This Catalog to Your Project
 
-Browse all 526 available skill names:
+Browse all 531 available skill names:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --list-skills
@@ -326,7 +326,7 @@ bash tests/test_installer.sh
 
 ```text
 antigravity-skills/
-├── skills/          # 526 modular skills (<name>/SKILL.md + scripts/ + references/ + assets/)
+├── skills/          # 531 modular skills (<name>/SKILL.md + scripts/ + references/ + assets/)
 ├── agents/          # 25 specialist subagents (auto-converted to .agent.md for Copilot)
 ├── rules/           # 100 rules (auto-converted to .instructions.md for Copilot)
 ├── scripts/         # Stdlib-only installer_engine.py (sparse sync & Copilot transformer)
