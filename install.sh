@@ -63,7 +63,7 @@ Target Scope Options:
 
 Install Mode Options (Default on fresh install: --minimal):
   --minimal               Install curated core pack (17 skills, 8 subagents, 8 rules) [DEFAULT]
-  --all                   Install full catalog (531 skills, 25 subagents, 100 rules)
+  --all                   Install full catalog (532 skills, 25 subagents, 100 rules)
   --skill <name[,name2]>  Install specific skill(s) without downloading the whole repo (additive)
   --role <role[,role2]>   Install curated role pack(s) via sparse checkout (additive)
                           Roles: frontend, backend, fullstack, qa, security, devops,
@@ -83,7 +83,7 @@ Examples:
   ./install.sh                                      # Interactive 2-step menu (Location + Mode)
   ./install.sh --local                              # Install Minimal pack in ./.agents
   ./install.sh --global                             # Install Minimal pack globally
-  ./install.sh --local --all                        # Install all 531 skills in ./.agents
+  ./install.sh --local --all                        # Install all 532 skills in ./.agents
   ./install.sh --local --skill stock-analysis       # Install ONLY 'stock-analysis' skill
   ./install.sh --global --role fullstack            # Install 'fullstack' role pack globally
   ./install.sh --claude --local --skill seo-audit   # Install 'seo-audit' in ./.claude/skills
@@ -412,7 +412,7 @@ PYEOF
     if [ "$ACTION" = "auto" ] && [ -z "$EXPLICIT_BASE" ] && [ -z "$REQ_ROLES_CSV" ] && [ -z "$REQ_SKILLS_CSV" ]; then
       printf "\n%bAntigravity Skills — Step 2/2: Choose Install Mode%b\n" "$C_BOLD" "$C_RESET" >/dev/tty
       printf "  1) Minimal  — Essential core (17 skills, 8 subagents, 8 rules) [default]\n" >/dev/tty
-      printf "  2) All      — Full library   (531 skills, 25 subagents, 100 rules)\n" >/dev/tty
+      printf "  2) All      — Full library   (532 skills, 25 subagents, 100 rules)\n" >/dev/tty
       printf "  3) Role     — Curated pack   (frontend, backend, fullstack, qa, security, devops, ai-ml, finance, product, marketing, founder)\n" >/dev/tty
       printf "  4) Skill    — Specific skill(s) without downloading full repo\n" >/dev/tty
       printf "\nSelect mode [1-4] (default: 1): " >/dev/tty
@@ -534,7 +534,7 @@ PYEOF
 
       if is_our_repo_clone "$target_dir"; then
         if { [ -n "$EXPLICIT_BASE" ] && [ "$EXPLICIT_BASE" != "all" ]; } || [ -n "$REQ_ROLES_CSV" ] || [ -n "$REQ_SKILLS_CSV" ]; then
-          warn "$target_dir is a full Git clone (all 531 skills already present); fast-forwarding clone. (Run --uninstall first if you want a slim selective install.)"
+          warn "$target_dir is a full Git clone (all 532 skills already present); fast-forwarding clone. (Run --uninstall first if you want a slim selective install.)"
         fi
         info "Existing antigravity-skills Git clone detected at $target_dir — updating..."
         git_update_clone "$target_dir"

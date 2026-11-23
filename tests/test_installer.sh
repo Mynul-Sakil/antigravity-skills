@@ -106,8 +106,8 @@ ROLES_OUT="$(HOME="$EMPTY_HOME" bash "$INSTALLER" --list-roles)"
 echo "$ROLES_OUT" | grep -q "fullstack" || fail "--list-roles missing fullstack"
 echo "$ROLES_OUT" | grep -q "c-suite -> founder" || fail "--list-roles missing alias"
 SKILLS_CNT="$(HOME="$EMPTY_HOME" bash "$INSTALLER" --list-skills | grep -c '^  ')"
-assert_eq "$SKILLS_CNT" "531" "--list-skills count"
-pass "TC-03: --list-roles and --list-skills work non-interactively (531 skills listed)"
+assert_eq "$SKILLS_CNT" "532" "--list-skills count"
+pass "TC-03: --list-roles and --list-skills work non-interactively (532 skills listed)"
 
 # ------------------------------------------------------------------------------
 # TC-04: --dry-run immutability
@@ -211,7 +211,7 @@ ALL_WS="$TEST_ROOT/all-ws"
 mkdir -p "$ALL_WS/.agents/skills/my-custom-skill"
 printf -- "---\nname: my-custom-skill\ndescription: Custom\n---\n" > "$ALL_WS/.agents/skills/my-custom-skill/SKILL.md"
 HOME="$EMPTY_HOME" bash "$INSTALLER" --local --dir "$ALL_WS" --all >/dev/null
-assert_eq "$(count_dirs "$ALL_WS/.agents/skills")" "532" "531 managed + 1 custom"
+assert_eq "$(count_dirs "$ALL_WS/.agents/skills")" "533" "532 managed + 1 custom"
 assert_eq "$(count_files "$ALL_WS/.agents/agents")" "25" "all 25 agents"
 assert_eq "$(count_files "$ALL_WS/.agents/rules")" "100" "all 100 rules"
 
@@ -219,7 +219,7 @@ HOME="$EMPTY_HOME" bash "$INSTALLER" --local --dir "$ALL_WS" --minimal >/dev/nul
 assert_eq "$(count_dirs "$ALL_WS/.agents/skills")" "18" "17 minimal + 1 preserved custom"
 [ -f "$ALL_WS/.agents/skills/my-custom-skill/SKILL.md" ] || fail "custom skill deleted during slim-down"
 cleanup_case "$ALL_WS"
-pass "TC-10: --all installs 531/25/100 and --minimal slims down cleanly while preserving custom skills (cleaned up)"
+pass "TC-10: --all installs 532/25/100 and --minimal slims down cleanly while preserving custom skills (cleaned up)"
 
 # ------------------------------------------------------------------------------
 # TC-11: Claude Code (--claude) across minimal, --skill, --role & --uninstall
@@ -259,7 +259,7 @@ assert_eq "$(count_dirs "$MIN_WS/.agents/skills")" "18" "stateful --update kept 
 grep -q "v1.0.1 upstream update" "$MIN_WS/.agents/skills/stock-analysis/SKILL.md" || fail "stock-analysis did not receive v1.0.1 update"
 [ ! -d "$MIN_WS/.agents/skills/kotlin-review" ] || fail "--update leaked unrelated skill into selective install"
 cleanup_case "$MIN_WS" "$MIN_HOME"
-pass "TC-12: Stateful --update pulls v1.0.1 changes without expanding 18-skill install to 531 (cleaned up)"
+pass "TC-12: Stateful --update pulls v1.0.1 changes without expanding 18-skill install to 532 (cleaned up)"
 
 # ------------------------------------------------------------------------------
 # TC-13: Backward Compatibility with Full Manual Git Clones

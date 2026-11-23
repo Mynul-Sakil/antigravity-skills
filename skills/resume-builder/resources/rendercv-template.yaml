@@ -1,0 +1,58 @@
+# RenderCV YAML Template (https://rendercv.com)
+# Usage: rendercv render resume.yaml
+
+cv:
+  name: Full Name
+  location: City, Country (Remote)
+  email: email@example.com
+  phone: "+1-555-000-0000"
+  website: https://example.com
+  social_networks:
+    - network: GitHub
+      username: username
+    - network: LinkedIn
+      username: username
+  sections:
+    summary:
+      - "2-3 concise sentences highlighting years of production experience, primary tech stack, and concrete engineering/business outcomes."
+    skills:
+      - label: Languages
+        details: TypeScript, JavaScript (ES6+), SQL, Python
+      - label: Backend & APIs
+        details: Node.js, Express.js, REST, GraphQL, tRPC, OAuth 2.0, JWT, CASL RBAC
+      - label: Databases & Queues
+        details: PostgreSQL, MongoDB, Redis, BullMQ, Prisma, Mongoose
+      - label: Frontend & Mobile
+        details: React, Next.js, Tailwind CSS, React Native
+      - label: DevOps & Testing
+        details: Docker, GitHub Actions, AWS (EC2, S3), Linux, Playwright, Jest
+    experience:
+      - company: Company Name
+        position: Role Title
+        location: Remote
+        start_date: 2026-04
+        end_date: present
+        highlights:
+          - "Architected [system] using [stack] for [concrete business/engineering outcome]."
+          - "Implemented [caching/queues/testing] to improve [latency/reliability]."
+    projects:
+      - name: "[Project Name](https://example.com)"
+        date: "Next.js, TypeScript, Node.js, PostgreSQL"
+        highlights:
+          - "Built [core capability] solving [concrete problem]."
+    education:
+      - institution: University Name
+        area: Computer Science
+        degree: B.Sc.
+        start_date: 2020-01
+        end_date: 2024-04
+        location: City, Country
+
+design:
+  theme: classic
+  page:
+    size: us-letter
+    top_margin: 0.6in
+    bottom_margin: 0.6in
+    left_margin: 0.6in
+    right_margin: 0.6in
