@@ -1,11 +1,11 @@
 # Antigravity Skills, Subagents & Rules
 
-[![Skills](https://img.shields.io/badge/Skills-532-10b981?style=for-the-badge)](#domain-highlights-532-skills)
+[![Skills](https://img.shields.io/badge/Skills-533-10b981?style=for-the-badge)](#domain-highlights-533-skills)
 [![Subagents](https://img.shields.io/badge/Subagents-25-3b82f6?style=for-the-badge)](#25-native-subagents)
 [![Rules](https://img.shields.io/badge/Rules-100-8b5cf6?style=for-the-badge)](#how-it-works)
 [![Agents](https://img.shields.io/badge/Works_With-Antigravity_%7C_Claude_%7C_Copilot-f59e0b?style=for-the-badge)](./INSTALLATION.md)
 
-A unified, production-ready customization pack for **Antigravity**, **Claude Code**, and **GitHub Copilot** featuring **532 on-demand skills**, **25 specialist subagents**, and **100 context-aware engineering rules** — with **selective sparse-checkout installation** so you can install the lean **Minimal Core** (default), **a single skill**, **a role pack**, or **all 532 skills**.
+A unified, production-ready customization pack for **Antigravity**, **Claude Code**, and **GitHub Copilot** featuring **533 on-demand skills**, **25 specialist subagents**, and **100 context-aware engineering rules** — with **selective sparse-checkout installation** so you can install the lean **Minimal Core** (default), **a single skill**, **a role pack**, or **all 533 skills**.
 
 ---
 
@@ -16,7 +16,7 @@ A unified, production-ready customization pack for **Antigravity**, **Claude Cod
 | **Minimal *(Default)*** | *(none)* or `--minimal` | **17** daily core skills, **8** core subagents, **8** core rules | **No** (sparse fetch) |
 | **Specific Skill(s)** | `--skill <name>` | **Only** the requested skill folder(s) (`SKILL.md` + `scripts/` + `references/`) | **No** (sparse fetch) |
 | **Role Pack** | `--role <role>` | Curated pack (`frontend`, `backend`, `fullstack`, `qa`, `security`, `devops`, `ai-ml`, `finance`, `product`, `marketing`, `founder`) | **No** (sparse fetch) |
-| **Full Catalog** | `--all` | All **532** skills, **25** subagents, and **100** rules | Yes |
+| **Full Catalog** | `--all` | All **533** skills, **25** subagents, and **100** rules | Yes |
 
 ---
 
@@ -88,7 +88,7 @@ curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main
 
 ---
 
-### 4. Antigravity — Full Catalog (`--all`: All 532 Skills, 25 Subagents, 100 Rules)
+### 4. Antigravity — Full Catalog (`--all`: All 533 Skills, 25 Subagents, 100 Rules)
 
 **Current Project Directory (`./.agents`):**
 
@@ -124,7 +124,7 @@ curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main
 curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --claude --local --skill stock-analysis
 ```
 
-**Claude Code — Install All 532 Skills Globally:**
+**Claude Code — Install All 533 Skills Globally:**
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --claude --global --all
@@ -194,14 +194,16 @@ This repository is built natively around **Progressive Disclosure** so you get d
 
 | Component | Folder | Total Available | How It Loads | Context Cost |
 | :--- | :--- | :---: | :--- | :--- |
-| **Skills & Slash Workflows** | `skills/<name>/SKILL.md` | **532** | Type `/<name>` in chat **or** ask in plain English | Full `SKILL.md`, `references/`, and `scripts/` load **only when activated** |
+| **Skills & Slash Workflows** | `skills/<name>/SKILL.md` | **533** | Type `/<name>` in chat **or** ask in plain English | Full `SKILL.md`, `references/`, and `scripts/` load **only when activated** |
 | **Specialist Subagents** | `agents/<name>.md` | **25** | Delegated via `invoke_subagent` (`subagent: true`) | Runs in an **isolated subagent context**; sized to keep built-in `browser` & `research` active |
 | **Core Engineering Rules** | `rules/common-*.md` | **8** (+1 optional) | `trigger: always_on` | Compact baseline (immutability, TDD, security, code review, git workflow) |
 | **Language & Stack Rules** | `rules/<stack>-*.md` | **91** | `trigger: glob` (e.g. `**/*.ts`, `**/*.py`) | **Zero tokens** until you open or edit matching files |
 
 ---
 
-## Domain Highlights (532 Skills)
+## Domain Highlights (533 Skills)
+
+> **Full A–Z Skill List:** Browse all **533** skill names, slash commands, and descriptions in **[SKILLS.md](./SKILLS.md)**.
 
 Every skill includes structured workflows, reference checklists, and (where applicable) **zero-dependency Python 3 CLI tools** (`scripts/*.py`, stdlib-only). All skills work as `/<skill-name>` slash commands:
 
@@ -213,12 +215,12 @@ Every skill includes structured workflows, reference checklists, and (where appl
 | **Multi-Agent Orchestration** | `/orch-workflow`, `/gan-build`, `/gan-design`, `/santa-method`, `/council`, `/hub-run` |
 | **Git, PR & DevOps** | `/pr`, `/code-review`, `/git-sync`, `/deploy-verify`, `/runbook-generator`, `/pm2`, `/quality-gate` |
 | **Security & AI Safety** | `/senior-security`, `/ai-security`, `/red-team`, `/threat-detection`, `/soc2-compliance`, `/gdpr-dsgvo-expert`, `/eu-ai-act-specialist` |
-| **Stock, Finance & Valuation** | `/stock-analysis`, `/dse-stock-analyst`, `/financial-analyst`, `/passive-deal-screener`, `/business-investment-advisor`, `/cfo-advisor` |
+| **Stock, Finance & Valuation** | `/stock-analysis`, `/dse-stock-analyst`, `/exness-strategy-indicator`, `/financial-analyst`, `/passive-deal-screener`, `/business-investment-advisor`, `/cfo-advisor` |
 | **Deep Research & Intel** | `/deep-research`, `/exa-search`, `/pulse`, `/competitive-intel`, `/graphify` |
 | **Product & Agile Delivery** | `/agile-product-owner`, `/product-discovery`, `/product-strategist`, `/product-analytics`, `/experiment-designer`, `/jira-expert` |
 | **C-Suite & Strategy** | `/boardroom`, `/ceo-advisor`, `/cto-review`, `/cpo-review`, `/challenge`, `/stress-test`, `/hard-call`, `/scenario-war-room` |
 | **Marketing, SEO & CRO** | `/seo-audit`, `/page-cro`, `/signup-flow-cro`, `/form-cro`, `/pricing-strategy`, `/launch-strategy`, `/social-content` |
-| **Daily Productivity** | `/today-summary`, `/weekly-presentation-organizer`, `/rewrite`, `/prompt-engineer`, `/coding-prompt-spec`, `/book-mentor`, `/mock-tech-interview`, `/job-application-email`, `/sessions`, `/session-handoff` |
+| **Daily Productivity** | `/today-summary`, `/weekly-presentation-organizer`, `/rewrite`, `/prompt-engineer`, `/coding-prompt-spec`, `/book-mentor`, `/mock-tech-interview`, `/job-application-email`, `/resume-builder`, `/sessions`, `/session-handoff` |
 
 ---
 
@@ -267,7 +269,7 @@ python3 .agents/skills/financial-analyst/scripts/ratio_calculator.py .agents/ski
 
 ### Option A: Add an Existing Skill from This Catalog to Your Project
 
-Browse all 532 available skill names:
+Browse all 533 available skill names in **[SKILLS.md](./SKILLS.md)** or from the CLI:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --list-skills
@@ -314,6 +316,12 @@ description: "Use when <exact trigger condition or user request> — <concise on
 **Tips when contributing a skill back to this repo:**
 - Keep `name:` identical to the folder name and `SKILL.md` focused (`< 800` lines).
 - If the skill belongs in a curated pack, add its folder name to `profiles.json` under `minimal` or a `roles.<name>.skills` list.
+- Regenerate `SKILLS.md` so the A–Z catalog stays in sync:
+
+```bash
+python3 scripts/generate_skills_list.py
+```
+
 - Run the self-cleaning 17-suite test harness before committing:
 
 ```bash
@@ -326,14 +334,15 @@ bash tests/test_installer.sh
 
 ```text
 antigravity-skills/
-├── skills/          # 532 modular skills (<name>/SKILL.md + scripts/ + references/ + assets/)
+├── skills/          # 533 modular skills (<name>/SKILL.md + scripts/ + references/ + assets/)
 ├── agents/          # 25 specialist subagents (auto-converted to .agent.md for Copilot)
 ├── rules/           # 100 rules (auto-converted to .instructions.md for Copilot)
-├── scripts/         # Stdlib-only installer_engine.py (sparse sync & Copilot transformer)
+├── scripts/         # Stdlib-only installer_engine.py & generate_skills_list.py
 ├── tests/           # Self-cleaning 17-suite E2E test harness (tests/test_installer.sh)
 ├── profiles.json    # Declarative catalog for 'minimal' default & 11 '--role' packs
 ├── plugin.json      # Native Antigravity plugin manifest (used for --global installs)
 ├── install.sh       # Selective sparse-checkout installer, updater & uninstaller
+├── SKILLS.md        # Complete auto-generated A–Z catalog of all 533 skills
 ├── INSTALLATION.md  # Complete Antigravity, Claude Code & GitHub Copilot setup guide
 └── README.md
 ```
@@ -342,5 +351,6 @@ antigravity-skills/
 
 ## Documentation & Support
 
+- **Complete A–Z Skill Catalog (533 Skills)**: [SKILLS.md](./SKILLS.md)
 - **Complete Setup, Single-Skill / Role Guides, Claude Code & Uninstallation**: [INSTALLATION.md](./INSTALLATION.md)
 - **Author**: [Mynul-Sakil](https://github.com/Mynul-Sakil)

@@ -60,7 +60,7 @@ By default, running `install.sh` installs **`--minimal`** via Git sparse checkou
 | **Minimal *(Default)*** | *(omitted)* or `--minimal` | **17** core skills, **8** core subagents, **8** `common-*` rules | Fast, zero-bloat daily engineering baseline |
 | **Specific Skill(s)** | `--skill <name[,name2]>` | Only the named skill folder(s) | Grabbing 1–5 specialized skills without downloading the repo |
 | **Role Pack** | `--role <role[,role2]>` | Curated role skills + matching subagents + stack rules | Tailoring to your role (`frontend`, `backend`, `fullstack`, `finance`, etc.) |
-| **Full Catalog** | `--all` | All **532** skills, **25** subagents, **100** rules | Complete offline library of every domain skill |
+| **Full Catalog** | `--all` | All **533** skills, **25** subagents, **100** rules | Complete offline library of every domain skill |
 
 ### What Is Included in `minimal` (Default)?
 
@@ -90,13 +90,13 @@ curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main
 curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --global
 ```
 
-### Full Catalog (`--all`: All 532 Skills) — Current Directory (`./.agents`)
+### Full Catalog (`--all`: All 533 Skills) — Current Directory (`./.agents`)
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --local --all
 ```
 
-### Full Catalog (`--all`: All 532 Skills) — Global (`~/.gemini/config/plugins/antigravity-skills`)
+### Full Catalog (`--all`: All 533 Skills) — Global (`~/.gemini/config/plugins/antigravity-skills`)
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --global --all
@@ -116,13 +116,13 @@ curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main
 
 ### Manual Full Clone (Alternative to `install.sh --all`)
 
-**Clone all 532 skills into your current project (`./.agents`):**
+**Clone all 533 skills into your current project (`./.agents`):**
 
 ```bash
 git clone --depth 1 https://github.com/Mynul-Sakil/antigravity-skills.git .agents
 ```
 
-**Clone all 532 skills globally:**
+**Clone all 533 skills globally:**
 
 ```bash
 mkdir -p ~/.gemini/config/plugins && git clone --depth 1 https://github.com/Mynul-Sakil/antigravity-skills.git ~/.gemini/config/plugins/antigravity-skills
@@ -156,7 +156,9 @@ curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main
 curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --local --skill stock-analysis,financial-analyst,seo-audit
 ```
 
-### Browse All 532 Available Skill Names
+### Browse All 533 Available Skill Names
+
+View the full A–Z table in **[SKILLS.md](./SKILLS.md)** or list all skill names from the CLI:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --list-skills
@@ -210,7 +212,7 @@ curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main
 
 ## 7. Claude Code Installation Guide (`--claude`)
 
-All **532 skills** follow the universal `SKILL.md` standard and work natively in **Claude Code** (including `/<skill-name>` slash commands). Passing `--claude` syncs only `skills/` (skipping Antigravity-only `agents/` and `rules/`) and tracks files via `.antigravity-skills.manifest` so your `CLAUDE.md`, `settings.json`, and custom skills are **never** touched.
+All **533 skills** follow the universal `SKILL.md` standard and work natively in **Claude Code** (including `/<skill-name>` slash commands). Passing `--claude` syncs only `skills/` (skipping Antigravity-only `agents/` and `rules/`) and tracks files via `.antigravity-skills.manifest` so your `CLAUDE.md`, `settings.json`, and custom skills are **never** touched.
 
 ### Claude Code — Minimal Pack *(Default: 17 Core Skills)* in Current Project (`./.claude/skills`)
 
@@ -236,20 +238,20 @@ curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main
 curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --claude --global --role fullstack
 ```
 
-### Claude Code — Install All 532 Skills Globally
+### Claude Code — Install All 533 Skills Globally
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --claude --global --all
 ```
 
 > [!NOTE]
-> **Claude Code Context Tip:** Using the default `minimal`, `--skill`, or `--role` modes keeps your skill list well inside Claude Code's default `1%` skill-listing budget (`skillListingBudgetFraction: 0.01`). If you install `--all` (532 skills) in Claude Code, you can optionally set `"skillListingBudgetFraction": 0.03` in `~/.claude/settings.json`.
+> **Claude Code Context Tip:** Using the default `minimal`, `--skill`, or `--role` modes keeps your skill list well inside Claude Code's default `1%` skill-listing budget (`skillListingBudgetFraction: 0.01`). If you install `--all` (533 skills) in Claude Code, you can optionally set `"skillListingBudgetFraction": 0.03` in `~/.claude/settings.json`.
 
 ---
 
 ## 8. GitHub Copilot Installation Guide (`--copilot`)
 
-All **532 skills** follow the open `agentskills.io` `SKILL.md` standard natively supported by **VS Code Copilot Agent Mode**, **GitHub Copilot CLI**, and **GitHub Copilot Cloud Coding Agent**.
+All **533 skills** follow the open `agentskills.io` `SKILL.md` standard natively supported by **VS Code Copilot Agent Mode**, **GitHub Copilot CLI**, and **GitHub Copilot Cloud Coding Agent**.
 
 - **`--copilot --local`** installs into `./.github/`:
   - `skills/<name>/SKILL.md` *(copied verbatim with `scripts/`, `references/`, `assets/`)*
@@ -281,7 +283,7 @@ curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main
 curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --copilot --local --role fullstack
 ```
 
-### GitHub Copilot — Install All 532 Skills Locally
+### GitHub Copilot — Install All 533 Skills Locally
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Mynul-Sakil/antigravity-skills/main/install.sh | bash -s -- --copilot --local --all
@@ -312,7 +314,7 @@ mkdir -p .claude && ln -s ../.agents/skills .claude/skills
 
 ## 10. Updating an Existing Installation (`--update`)
 
-`install.sh` stores your active mode, roles, and added skills in `.antigravity-skills.manifest` (`# @state {...}`). When you run `--update`, it refreshes **only** what you installed — it will never unexpectedly bloat a `minimal` or `--skill` install into all 532 skills, and it never overwrites custom or locally edited files.
+`install.sh` stores your active mode, roles, and added skills in `.antigravity-skills.manifest` (`# @state {...}`). When you run `--update`, it refreshes **only** what you installed — it will never unexpectedly bloat a `minimal` or `--skill` install into all 533 skills, and it never overwrites custom or locally edited files.
 
 ### Auto-Detect and Update Antigravity (Local, Global, or Both)
 
@@ -405,7 +407,7 @@ git config --global core.autocrlf input
 ls -1 .agents/skills | wc -l
 ```
 
-*(Expected: `17` for default `--minimal`, `532` for `--all`, or your exact `--skill` / `--role` count.)*
+*(Expected: `17` for default `--minimal`, `533` for `--all`, or your exact `--skill` / `--role` count.)*
 
 ### Smoke-Test a Bundled Python Calculator (Requires `financial-analyst` Skill)
 
