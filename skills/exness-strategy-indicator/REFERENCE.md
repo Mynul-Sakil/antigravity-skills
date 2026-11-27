@@ -25,6 +25,8 @@
 3. **Explicit container typing**: Annotate lists explicitly, e.g. `self._htf_highs: list[float] = []`.
 4. **Helper function signatures**: Annotate parameter and return types on module-level helpers (e.g. `def _is_pivot_high(vals: list[float], left: int, right: int) -> bool:`).
 5. **Plot decorator alignment**: The count and top-to-bottom order of `@plot.*` decorators on `Main` must **strictly match** the tuple returned by `Main.calc()` (or `def Main()`).
+6. **No chained comparisons**: Indie v5 rejects multi-operand comparisons like `a <= x <= b` (`cannot process multiple operands in comparison`); always write `x >= a and x <= b`.
+7. **`min`/`max` argument limit**: Indie v5 `min()` / `max()` only accept 2–3 positional arguments (or a single `list[int]` / `list[float]`); nest calls like `max(a, max(b, c), max(d, e))` for 4+ values.
 
 ### Live-Tick-Safe State (`MutSeriesF`)
 - Instantiate `MutSeriesF.new(init=...)` unconditionally at the top of `Main.calc(self)` (never inside conditional `if` branches).

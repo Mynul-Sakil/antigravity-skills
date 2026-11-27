@@ -10,6 +10,8 @@ Catches common Exness Web Terminal compiler and runtime errors locally using std
   6. `@plot.*` decorator count on `Main` matches every return tuple length in `Main.calc` / `def Main`
   7. No `MutSeriesF.new(...)` variable rebound to another type inside `Main.calc` / `def Main`
   8. No unannotated `var = None` later assigned a string inside `Main.calc` / `def Main`
+  9. No chained comparisons (`a < b < c`); Indie v5 requires explicit `and` (`a < b and b < c`)
+  10. No `min`/`max` calls with > 3 positional arguments (`Indie v5` supports 2-3 args or a single list)
 """
 
 from __future__ import annotations
@@ -129,6 +131,21 @@ def validate_script(path: Path, allow_calc_on: bool = False) -> list[str]:
         elif isinstance(node, ast.Name) and node.id == "param_ref":
             errors.append(
                 f"Line {node.lineno}: `@param_ref` fails when bound to `class Main(MainContext)` in Exness Terminal"
+            )
+        elif isinstance(node, ast.Compare) and len(node.ops) > 1:
+            errors.append(
+                f"Line {node.lineno}: Indie v5 cannot process chained comparisons (`x < y < z`); "
+                "split into explicit `and` comparisons"
+            )
+        elif (
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id in ("min", "max")
+            and len(node.args) > 3
+        ):
+            errors.append(
+                f"Line {node.lineno}: `{node.func.id}()` got {len(node.args)} positional args; "
+                "Indie v5 only supports 2-3 positional args or a single list"
             )
 
     calc_fn, main_decorators = _find_entry_func(tree)
